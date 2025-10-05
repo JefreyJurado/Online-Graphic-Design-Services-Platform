@@ -1,3 +1,130 @@
+/* ==========================================
+   BOOTSTRAP OVERRIDES - Keep Custom Design
+   ========================================== */
+
+/* Force navbar to use custom styling */
+.navbar.custom-nav {
+  background-color: #3471cc21 !important;
+  backdrop-filter: blur(10px) !important;
+  padding: 1rem 2rem !important;
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 1000 !important;
+}
+
+/* Keep navbar links styled my way */
+.navbar .nav-link {
+  display: inline-block !important;
+  margin: 0 0.3rem !important;
+  padding: 0.4rem 1rem !important;
+  color: #02f7ff !important;
+  font-weight: bold !important;
+  font-size: 0.9rem !important;
+  border-radius: 5px !important;
+  background: none !important;
+  transition: all 0.3s ease !important;
+}
+
+.navbar .nav-link:hover {
+  background: rgba(255, 255, 255, 0.15) !important;
+  color: #BDD4F2 !important;
+  transform: translateY(-2px) !important;
+}
+
+.navbar .nav-link.active {
+  background: #1C4D8C !important;
+  color: #ffffff !important;
+}
+
+/* Mobile menu button styling */
+.navbar-toggler {
+  border-color: #02f7ff !important;
+  background-color: rgba(2, 247, 255, 0.1) !important;
+}
+
+.navbar-toggler-icon {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='%2302f7ff' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
+}
+
+/* Transparent nav on home page */
+body.home .navbar.custom-nav {
+  background-color: transparent !important;
+  backdrop-filter: none !important;
+  box-shadow: none !important;
+}
+
+/* Keep button styles */
+.btn {
+  border-radius: 5px !important;
+  font-weight: 600 !important;
+  transition: transform 0.2s, background 0.2s, color 0.2s !important;
+}
+
+.hero-buttons .btn {
+  display: inline-block !important;
+  margin-top: 1.5rem !important;
+  margin-right: 1rem !important;
+  padding: 0.4rem 0.6rem !important;
+  background: #7e0101 !important;
+  color: #fff !important;
+  border: none !important;
+}
+
+.hero-buttons .btn:hover {
+  transform: translateY(-6px) scale(1.03) !important;
+  background: #BDD4F2 !important;
+  color: #172940 !important;
+  box-shadow: 0 0.5rem 1.25rem rgba(0,0,0,0.15) !important;
+}
+
+.hero-buttons .btn-secondary {
+  background: #1C4D8C !important;
+}
+
+.hero-buttons .btn-secondary:hover {
+  background: #BDD4F2 !important;
+}
+
+/* Keep resume button styles */
+.about .resume-buttons .btn {
+  margin: 1.9rem 0 !important;
+  padding: 0.4rem 0.6rem !important;
+  background-color: #1C4D8C !important;
+  color: #fff !important;
+  border: none !important;
+}
+
+.resume-buttons .btn:hover {
+  transform: translateY(-4px) scale(1.05) !important;
+  background: #BDD4F2 !important;
+  color: #172940 !important;
+  box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.2) !important;
+}
+
+/* Keep contact form button */
+.contact-form button.btn {
+  width: 100% !important;
+  padding: 1rem !important;
+  background: #7e0101 !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 8px !important;
+  font-size: 1.1rem !important;
+  font-weight: 600 !important;
+  margin-top: 1rem !important;
+}
+
+.contact-form button.btn:hover {
+  background: #fd0404 !important;
+  transform: translateY(-3px) !important;
+}
+
+/* Reset Bootstrap's container padding */
+.container-fluid {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
 /* Reset */
 * {
   margin: 0;
@@ -322,7 +449,6 @@ section {
   color: #172940;
 }
 
-
 /* Moving Light Effects */
 .project-card {
   position: relative;
@@ -579,7 +705,6 @@ section {
   to   { transform: translateX(0); }
 }
 
-
 /* Testimonials Section */
 
 .testimonials {
@@ -654,31 +779,6 @@ section {
   margin-top: 0.4rem;
 }
 
-/* Contact Section - Centered */
-
- /* .contact {
-  display: flex;
-  flex-direction: column;
-  justify-content: center; 
-  align-items: center;      
-  min-height: 60vh;        
-  padding: 0 1rem;
-  text-align: center;       
-  margin-top: 6.5%;
-} */
-
-/* .contact h2 {
-  font-size: 2.3rem;
-  font-weight: bold;
-  margin-bottom: 0.5rem;
-} */
-
-/* .contact p {
-  font-size: 1rem;
-  margin-bottom: 1.5rem;
-  color: #fff;
-} */
-
 .contact-links {
   display: grid;
   grid-template-columns: repeat(3, 1fr); 
@@ -690,21 +790,6 @@ section {
 }
 
 .contact-links a {
-  /* background: #1C4D8C;
-  color: #fff;
-  border-radius: 8px;
-  padding: 1rem 0;
-  text-align: center;
-  font-weight: 600;
-  text-decoration: none;
-  box-shadow: 0 0.125rem 0.5rem rgba(0,0,0,0.08);
-  transition: transform 0.2s, background 0.2s, color 0.2s; */
-
-  /* display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem; */
-
   width: 180px;   
   height: 60px;  
   min-width: 180px; 
@@ -717,21 +802,27 @@ section {
   color: #172940;
 }
 
-/* .contact-links a i {
-  font-size: 1.2rem;
-}  */
-
 /* Footer */
 footer {
   width: 100%;
   text-align: center;
-  padding: 0.5rem;
+  padding: 0;                 /* Remove padding */
   font-size: 0.8rem;
   color: #fff;
   background-color: #3471cc21;
   backdrop-filter: blur(10px);
-  margin-top: 0; /* reset */
-  position: static; /* allow footer to follow content */
+  margin-top: 1rem;
+  position: static;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.5rem;         /* Adjust this for desired height */
+}
+
+/* Remove default paragraph margins inside footer */
+footer p {
+  margin: 0;
+  padding: 0;
 }
 
 /* Footer Links */
@@ -767,6 +858,17 @@ main {
 }
 
 /* RESPONSIVE DESIGN */
+
+/* Center mobile menu items */
+@media (max-width: 767px) {
+  .navbar-collapse {
+    text-align: center;
+  }
+  
+  .navbar-nav {
+    align-items: center;
+  }
+}
 
 /* Tablet (≤ 900px) */
 @media (max-width: 900px) {
@@ -987,7 +1089,6 @@ section.visible {
   }
 }
 
-
 /* ===== CONTACT PAGE ENHANCEMENTS ===== */
 
 /* Availability Status */
@@ -1140,12 +1241,6 @@ section.visible {
   margin-bottom: 1rem;
 }
 
-/* .contact-links a i  {
-  font-size: 1.7rem;
-  margin-bottom: 0rem;
-  color: #fff;
-} */
-
 .contact-links i  {
   font-size: 1.7rem;
   margin-bottom: 0.1rem;
@@ -1170,18 +1265,7 @@ section.visible {
 .contact-links a:hover {
   transform: translateY(-5px);
   background: #fff;
-  /* border-color: #fff; */
-  /* box-shadow: 0 10px 25px rgba(0,0,0,0.2); */
 }
-
-/* Email card special styling */
-/* .contact-links a[href*="mailto:"] {
-  background: #7e0101;
-} */
-
-/* .contact-links a[href*="mailto:"]:hover {
-  background: #7e0101;
-} */
 
 /* Mobile Responsiveness */
 @media (max-width: 1200px) {
@@ -1216,4 +1300,3 @@ section.visible {
     padding: 1rem 0.5rem;
   }
 }
-

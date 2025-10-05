@@ -240,9 +240,6 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-
-
-
 // CONTACT PAGE ENHANCEMENTS
 document.addEventListener("DOMContentLoaded", () => {
   // Only run on contact page
@@ -333,10 +330,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 });
-
-
-
-
 
 // Email validation helper (ADD THIS NEW FUNCTION)
 function isValidEmail(email) {
