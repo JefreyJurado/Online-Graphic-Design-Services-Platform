@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Our Services - Jefrey Jurado</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Open Sans', Arial, sans-serif;
+      background: linear-gradient(135deg, #1C4D8C, #000);
+      min-height: 100vh;
+      color: #fff;
+    }
+    
+    nav {
+      background: rgba(52, 113, 204, 0.3);
+      backdrop-filter: blur(10px);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .nav-left a {
+      color: #50c2f7;
+      text-decoration: none;
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+    
+    .nav-right {
+      display: flex;
+      gap: 1rem;
+    }
+    
+    .nav-right a {
+      color: #02f7ff;
+      text-decoration: none;
+      padding: 0.5rem 1rem;
+      border-radius: 5px;
+      font-weight: 600;
+    }
+    
+    .nav-right a:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
+    
+    main {
+      padding: 3rem 2rem;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    
+    .page-header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+    
+    .page-header h1 {
+      color: #50c2f7;
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
+    
+    .page-header p {
+      color: #ddd;
+      font-size: 1.1rem;
+    }
+    
+    .filters {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+    
+    .filter-btn {
+      padding: 0.7rem 1.5rem;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: white;
+      border-radius: 25px;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-weight: 500;
+    }
+    
+    .filter-btn:hover,
+    .filter-btn.active {
+      background: #50c2f7;
+      color: #000;
+      border-color: #50c2f7;
+    }
+    
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+    
+    .service-card {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 15px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      overflow: hidden;
+      transition: transform 0.3s;
+      cursor: pointer;
+    }
+    
+    .service-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 10px 30px rgba(80, 194, 247, 0.3);
+    }
+    
+    .service-image {
+      width: 100%;
+      height: 200px;
+      background: linear-gradient(135deg, #1C4D8C, #50c2f7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 4rem;
+    }
+    
+    .service-content {
+      padding: 1.5rem;
+    }
+    
+    .service-category {
+      display: inline-block;
+      background: #50c2f7;
+      color: #000;
+      padding: 0.3rem 0.8rem;
+      border-radius: 15px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+    
+    .service-card h3 {
+      color: #50c2f7;
+      margin: 1rem 0;
+      font-size: 1.5rem;
+    }
+    
+    .service-card p {
+      color: #ddd;
+      margin-bottom: 1rem;
+      line-height: 1.6;
+    }
+    
+    .service-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .service-price {
+      color: #50c2f7;
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+    
+    .service-duration {
+      color: #ddd;
+      font-size: 0.9rem;
+    }
+    
+    .loading {
+      text-align: center;
+      padding: 3rem;
+      font-size: 1.2rem;
+      color: #50c2f7;
+    }
+    
+    .no-services {
+      text-align: center;
+      padding: 3rem;
+      color: #ddd;
+    }
+    
+    footer {
+      background: rgba(52, 113, 204, 0.3);
+      backdrop-filter: blur(10px);
+      padding: 1rem;
+      text-align: center;
+      margin-top: 3rem;
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-left">
+    <a href="index.html">🎨 Design Platform</a>
+  </div>
+  <div class="nav-right" id="navLinks">
+    <a href="services.html">Services</a>
+    <a href="client-dashboard.html">Dashboard</a>
+    <a href="login.html" id="authLink">Login</a>
+  </div>
+</nav>
+
+<main>
+  <div class="page-header">
+    <h1>Our Services</h1>
+    <p>Explore our professional graphic design services tailored to your needs</p>
+  </div>
+
+  <div class="filters">
+    <button class="filter-btn active" data-category="all">All Services</button>
+    <button class="filter-btn" data-category="Logo Design">Logo Design</button>
+    <button class="filter-btn" data-category="Branding">Branding</button>
+    <button class="filter-btn" data-category="Social Media">Social Media</button>
+    <button class="filter-btn" data-category="Print Design">Print Design</button>
+    <button class="filter-btn" data-category="Packaging">Packaging</button>
+    <button class="filter-btn" data-category="Web Design">Web Design</button>
+  </div>
+
+  <div id="loadingMessage" class="loading">
+    Loading services...
+  </div>
+
+  <div id="servicesGrid" class="services-grid" style="display: none;">
+    <!-- Services will be inserted here by JavaScript -->
+  </div>
+
+  <div id="noServices" class="no-services" style="display: none;">
+    <h3>No services available</h3>
+    <p>Check back later for new services!</p>
+  </div>
+</main>
+
+<footer>
+  <p>© 2026 Jefrey Jurado. All rights reserved.</p>
+</footer>
+
+<script>
+  const API_URL = 'http://localhost:5000/api';
+  let allServices = [];
+  let currentCategory = 'all';
+  
+  // Check if user is logged in
+  const token = localStorage.getItem('token');
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  
+  if (token && user.name) {
+    document.getElementById('authLink').textContent = 'Logout';
+    document.getElementById('authLink').href = '#';
+    document.getElementById('authLink').onclick = logout;
+  }
+  
+  function logout() {
+    if (confirm('Are you sure you want to logout?')) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      window.location.href = 'login.html';
+    }
+  }
+  
+  // Fetch all services
+  async function fetchServices() {
+    try {
+      const response = await fetch(`${API_URL}/services`);
+      const data = await response.json();
+      
+      document.getElementById('loadingMessage').style.display = 'none';
+      
+      if (data.success && data.services.length > 0) {
+        allServices = data.services;
+        displayServices(allServices);
+      } else {
+        document.getElementById('noServices').style.display = 'block';
+      }
+    } catch (error) {
+      console.error('Fetch services error:', error);
+      document.getElementById('loadingMessage').textContent = 'Error loading services. Make sure backend is running.';
+    }
+  }
+  
+  // Display services
+  function displayServices(services) {
+    const grid = document.getElementById('servicesGrid');
+    grid.style.display = 'grid';
+    
+    if (services.length === 0) {
+      grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #ddd;">No services found in this category.</p>';
+      return;
+    }
+    
+    grid.innerHTML = services.map(service => `
+      <div class="service-card" onclick="viewService('${service._id}')">
+        <div class="service-image">
+          ${service.image ? `<img src="${service.image}" alt="${service.name}" style="width:100%; height:100%; object-fit:cover;">` : getIcon(service.category)}
+        </div>
+        <div class="service-content">
+          <span class="service-category">${service.category}</span>
+          <h3>${service.name}</h3>
+          <p>${service.description.substring(0, 100)}${service.description.length > 100 ? '...' : ''}</p>
+          <div class="service-meta">
+            <div class="service-price">₱${service.price.toLocaleString()}</div>
+            <div class="service-duration">⏱️ ${service.duration}</div>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+  
+  // Get icon based on category
+  function getIcon(category) {
+    const icons = {
+      'Logo Design': '🎨',
+      'Branding': '🏢',
+      'Social Media': '📱',
+      'Print Design': '🖨️',
+      'Packaging': '📦',
+      'Web Design': '💻',
+      'Other': '✨'
+    };
+    return icons[category] || '✨';
+  }
+  
+  // Filter by category
+  function filterServices(category) {
+    currentCategory = category;
+    
+    // Update active button
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.classList.remove('active');
+      if (btn.dataset.category === category) {
+        btn.classList.add('active');
+      }
+    });
+    
+    // Filter services
+    if (category === 'all') {
+      displayServices(allServices);
+    } else {
+      const filtered = allServices.filter(s => s.category === category);
+      displayServices(filtered);
+    }
+  }
+  
+  // View service details
+  function viewService(id) {
+    window.location.href = `service-details.html?id=${id}`;
+  }
+  
+  // Add event listeners to filter buttons
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      filterServices(btn.dataset.category);
+    });
+  });
+  
+  // Load services on page load
+  fetchServices();
+</script>
+</body>
+</html>

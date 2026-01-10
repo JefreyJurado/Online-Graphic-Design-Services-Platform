@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - Jefrey Jurado</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Open Sans', Arial, sans-serif;
+      background: linear-gradient(135deg, #1C4D8C, #000);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      color: #fff;
+    }
+    
+    nav {
+      background: rgba(52, 113, 204, 0.3);
+      backdrop-filter: blur(10px);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .nav-left {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #ff9800;
+    }
+    
+    .nav-right {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+    
+    .nav-right span {
+      color: #fff;
+    }
+    
+    .btn-logout {
+      padding: 0.5rem 1rem;
+      background: #7e0101;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    
+    .btn-logout:hover {
+      background: #fd0404;
+    }
+    
+    main {
+      flex: 1;
+      padding: 2rem;
+      max-width: 1400px;
+      margin: 0 auto;
+      width: 100%;
+    }
+    
+    .admin-header {
+      background: rgba(255, 152, 0, 0.1);
+      border: 2px solid #ff9800;
+      padding: 1.5rem;
+      border-radius: 12px;
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+    
+    .admin-header h1 {
+      color: #ff9800;
+      margin-bottom: 0.5rem;
+    }
+    
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 3rem;
+    }
+    
+    .stat-card {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      padding: 1.5rem;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      text-align: center;
+    }
+    
+    .stat-card .icon {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .stat-card .number {
+      font-size: 2rem;
+      font-weight: bold;
+      color: #50c2f7;
+      margin: 0.5rem 0;
+    }
+    
+    .stat-card .label {
+      color: #ddd;
+      font-size: 0.9rem;
+    }
+    
+    .section-title {
+      color: #50c2f7;
+      margin: 2rem 0 1rem 0;
+      font-size: 1.8rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .tabs {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+    
+    .tab-btn {
+      padding: 0.8rem 1.5rem;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+    
+    .tab-btn:hover,
+    .tab-btn.active {
+      background: #50c2f7;
+      color: #000;
+      border-color: #50c2f7;
+    }
+    
+    .quote-card {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      padding: 1.5rem;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      margin-bottom: 1.5rem;
+    }
+    
+    .quote-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      margin-bottom: 1rem;
+    }
+    
+    .quote-title {
+      color: #50c2f7;
+      font-size: 1.3rem;
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+    }
+    
+    .status-badge {
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-weight: 600;
+      font-size: 0.85rem;
+    }
+    
+    .quote-details {
+      color: #ddd;
+      line-height: 1.8;
+    }
+    
+    .quote-actions {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1rem;
+      flex-wrap: wrap;
+    }
+    
+    .btn {
+      padding: 0.6rem 1.2rem;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+    
+    .btn-primary {
+      background: #50c2f7;
+      color: #000;
+    }
+    
+    .btn-success {
+      background: #4CAF50;
+      color: white;
+    }
+    
+    .btn-danger {
+      background: #f44336;
+      color: white;
+    }
+    
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+    
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .modal-content {
+      background: linear-gradient(135deg, #1C4D8C, #000);
+      padding: 2rem;
+      border-radius: 15px;
+      border: 2px solid #50c2f7;
+      max-width: 500px;
+      width: 90%;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+    
+    .modal-header h3 {
+      color: #50c2f7;
+      margin: 0;
+    }
+    
+    .close-modal {
+      background: transparent;
+      border: none;
+      color: white;
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+    
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: #fff;
+      font-weight: 600;
+    }
+    
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 0.8rem;
+      border: 1px solid #3471cc;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.9);
+      font-family: 'Open Sans', Arial, sans-serif;
+    }
+    
+    .loading {
+      text-align: center;
+      padding: 2rem;
+      color: #50c2f7;
+    }
+    
+    footer {
+      background: rgba(52, 113, 204, 0.3);
+      backdrop-filter: blur(10px);
+      padding: 1rem;
+      text-align: center;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-left">
+    🔧 ADMIN PANEL
+  </div>
+  <div class="nav-right">
+    <span>Admin: <strong id="adminName">Loading...</strong></span>
+    <button class="btn-logout" onclick="logout()">Logout</button>
+  </div>
+</nav>
+
+<main>
+  <div class="admin-header">
+    <h1>⚙️ Admin Dashboard</h1>
+    <p>Manage quotations, services, and platform operations</p>
+  </div>
+
+  <!-- Statistics -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="icon">📋</div>
+      <div class="number" id="totalQuotes">0</div>
+      <div class="label">Total Quotations</div>
+    </div>
+    
+    <div class="stat-card">
+      <div class="icon">⏳</div>
+      <div class="number" id="pendingQuotes">0</div>
+      <div class="label">Pending Quotes</div>
+    </div>
+    
+    <div class="stat-card">
+      <div class="icon">🎨</div>
+      <div class="number" id="totalServices">0</div>
+      <div class="label">Active Services</div>
+    </div>
+    
+    <div class="stat-card">
+      <div class="icon">👥</div>
+      <div class="number" id="totalClients">0</div>
+      <div class="label">Total Clients</div>
+    </div>
+  </div>
+
+  <!-- Quotation Management -->
+  <h2 class="section-title">
+    💬 Quotation Management
+  </h2>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="filterQuotes('all')">All Quotes</button>
+    <button class="tab-btn" onclick="filterQuotes('pending')">⏳ Pending</button>
+    <button class="tab-btn" onclick="filterQuotes('reviewing')">👀 Reviewing</button>
+    <button class="tab-btn" onclick="filterQuotes('quoted')">💰 Quoted</button>
+    <button class="tab-btn" onclick="filterQuotes('accepted')">✅ Accepted</button>
+  </div>
+
+  <div id="loadingQuotes" class="loading">Loading quotations...</div>
+  <div id="quotesContainer"></div>
+
+</main>
+
+<!-- Response Modal -->
+<div id="responseModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Respond to Quote</h3>
+      <button class="close-modal" onclick="closeModal()">&times;</button>
+    </div>
+    
+    <form id="responseForm">
+      <input type="hidden" id="quoteId">
+      
+      <div class="form-group">
+        <label>Project: <span id="modalProjectName"></span></label>
+      </div>
+      
+      <div class="form-group">
+        <label for="status">Status</label>
+        <select id="status" required>
+          <option value="reviewing">Reviewing</option>
+          <option value="quoted">Quoted (Price Set)</option>
+          <option value="accepted">Accepted</option>
+          <option value="rejected">Rejected</option>
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <label for="quotedPrice">Quoted Price (₱)</label>
+        <input type="number" id="quotedPrice" min="0" placeholder="Enter price">
+      </div>
+      
+      <div class="form-group">
+        <label for="adminNotes">Notes to Client</label>
+        <textarea id="adminNotes" rows="4" placeholder="Add notes or comments..."></textarea>
+      </div>
+      
+      <button type="submit" class="btn btn-success" style="width: 100%;">
+        Save Response
+      </button>
+    </form>
+  </div>
+</div>
+
+<footer>
+  <p>© 2025 Jefrey Jurado. All rights reserved.</p>
+</footer>
+
+<script>
+  const API_URL = 'http://localhost:5000/api';
+  
+  // Check if user is admin
+  const token = localStorage.getItem('token');
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  
+  if (!token || user.role !== 'admin') {
+    alert('Access denied. Admin only.');
+    window.location.href = 'login.html';
+  }
+  
+  document.getElementById('adminName').textContent = user.name || 'Admin';
+  
+  let allQuotations = [];
+  let currentFilter = 'all';
+  
+  function logout() {
+    if (confirm('Are you sure you want to logout?')) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      window.location.href = 'login.html';
+    }
+  }
+  
+  // Fetch all quotations
+  async function fetchQuotations() {
+    try {
+      const response = await fetch(`${API_URL}/quotations`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      const data = await response.json();
+      
+      document.getElementById('loadingQuotes').style.display = 'none';
+      
+      if (data.success) {
+        allQuotations = data.quotations;
+        updateStats(data.quotations);
+        displayQuotations(data.quotations);
+      }
+    } catch (error) {
+      console.error('Fetch error:', error);
+      document.getElementById('loadingQuotes').textContent = 'Error loading quotations';
+    }
+  }
+  
+  // Update statistics
+  function updateStats(quotations) {
+    document.getElementById('totalQuotes').textContent = quotations.length;
+    document.getElementById('pendingQuotes').textContent = 
+      quotations.filter(q => q.status === 'pending').length;
+  }
+  
+  // Fetch stats
+  async function fetchStats() {
+    try {
+      const [servicesRes] = await Promise.all([
+        fetch(`${API_URL}/services`)
+      ]);
+      
+      const servicesData = await servicesRes.json();
+      
+      if (servicesData.success) {
+        document.getElementById('totalServices').textContent = servicesData.count;
+      }
+      
+      // For now, set clients to a placeholder
+      document.getElementById('totalClients').textContent = '2';
+    } catch (error) {
+      console.error('Stats error:', error);
+    }
+  }
+  
+  // Display quotations
+  function displayQuotations(quotations) {
+    const container = document.getElementById('quotesContainer');
+    
+    if (quotations.length === 0) {
+      container.innerHTML = '<p style="text-align: center; color: #ddd; padding: 2rem;">No quotations found.</p>';
+      return;
+    }
+    
+    const statusColors = {
+      'pending': '#ff9800',
+      'reviewing': '#2196F3',
+      'quoted': '#9C27B0',
+      'accepted': '#4CAF50',
+      'rejected': '#f44336'
+    };
+    
+    const statusEmojis = {
+      'pending': '⏳',
+      'reviewing': '👀',
+      'quoted': '💰',
+      'accepted': '✅',
+      'rejected': '❌'
+    };
+    
+    container.innerHTML = quotations.map(quote => `
+      <div class="quote-card">
+        <div class="quote-header">
+          <div>
+            <div class="quote-title">${quote.projectName}</div>
+            <p style="color: #ddd; margin: 0; font-size: 0.9rem;">
+              Client: <strong>${quote.client.name}</strong> (${quote.client.email})
+            </p>
+            <p style="color: #ddd; margin: 0; font-size: 0.9rem;">
+              Service: <strong>${quote.service.name}</strong>
+            </p>
+          </div>
+          <div class="status-badge" style="background: ${statusColors[quote.status]}; color: white;">
+            ${statusEmojis[quote.status]} ${quote.status.toUpperCase()}
+          </div>
+        </div>
+        
+        <div class="quote-details">
+          <p><strong>Budget:</strong> ${quote.budget}</p>
+          <p><strong>Deadline:</strong> ${new Date(quote.deadline).toLocaleDateString()}</p>
+          <p><strong>Requested:</strong> ${new Date(quote.dateRequested).toLocaleDateString()}</p>
+          ${quote.quotedPrice > 0 ? `<p><strong>Quoted Price:</strong> ₱${quote.quotedPrice.toLocaleString()}</p>` : ''}
+          <p><strong>Description:</strong> ${quote.description}</p>
+          ${quote.adminNotes ? `<p><strong>Your Notes:</strong> ${quote.adminNotes}</p>` : ''}
+        </div>
+        
+        <div class="quote-actions">
+          <button class="btn btn-primary" onclick="openResponseModal('${quote._id}', '${quote.projectName}')">
+            Respond
+          </button>
+        </div>
+      </div>
+    `).join('');
+  }
+  
+  // Filter quotations
+  function filterQuotes(status) {
+    currentFilter = status;
+    
+    // Update active tab
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.classList.remove('active');
+    });
+    event.target.classList.add('active');
+    
+    if (status === 'all') {
+      displayQuotations(allQuotations);
+    } else {
+      const filtered = allQuotations.filter(q => q.status === status);
+      displayQuotations(filtered);
+    }
+  }
+  
+  // Open response modal
+  function openResponseModal(quoteId, projectName) {
+    document.getElementById('quoteId').value = quoteId;
+    document.getElementById('modalProjectName').textContent = projectName;
+    document.getElementById('responseModal').style.display = 'flex';
+  }
+  
+  // Close modal
+  function closeModal() {
+    document.getElementById('responseModal').style.display = 'none';
+    document.getElementById('responseForm').reset();
+  }
+  
+  // Handle response form submission
+  document.getElementById('responseForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const quoteId = document.getElementById('quoteId').value;
+    const status = document.getElementById('status').value;
+    const quotedPrice = document.getElementById('quotedPrice').value;
+    const adminNotes = document.getElementById('adminNotes').value;
+    
+    try {
+      const response = await fetch(`${API_URL}/quotations/${quoteId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          status,
+          quotedPrice: quotedPrice ? parseInt(quotedPrice) : 0,
+          adminNotes
+        })
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        alert('✅ Response saved successfully!');
+        closeModal();
+        fetchQuotations(); // Reload quotations
+      } else {
+        alert('❌ ' + data.message);
+      }
+    } catch (error) {
+      console.error('Update error:', error);
+      alert('❌ Error updating quotation');
+    }
+  });
+  
+  // Load data on page load
+  fetchQuotations();
+  fetchStats();
+</script>
+</body>
+</html>

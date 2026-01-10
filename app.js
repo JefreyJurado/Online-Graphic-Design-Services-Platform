@@ -52,7 +52,7 @@ function typeWriter(element, text, speed = 60) {
 
 const heroTitle = document.querySelector(".hero-text h1");
 if (heroTitle) {
-  const text = "Hi, I’m Jefrey - Graphic Designer & Web Developer";
+  const text = "Hi, I’m Jefrey - Creative Graphic Designer";
   heroTitle.innerHTML = "";
   typeWriter(heroTitle, text, 60);
 }
