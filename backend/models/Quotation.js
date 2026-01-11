@@ -37,9 +37,9 @@ const quotationSchema = new mongoose.Schema({
     type: String,
     default: ''
   },
-  status: {
+    status: {
     type: String,
-    enum: ['pending', 'reviewing', 'quoted', 'accepted', 'rejected', 'completed'],
+    enum: ['pending', 'reviewing', 'quoted', 'accepted', 'in_progress', 'revision_requested', 'completed', 'rejected'],
     default: 'pending'
   },
   quotedPrice: {
@@ -49,6 +49,18 @@ const quotationSchema = new mongoose.Schema({
   adminNotes: {
     type: String,
     default: ''
+  },
+  revisionRequest: {
+    type: String,
+    default: ''
+  },
+  revisionFee: {
+    type: Number,
+    default: 0
+  },
+  revisionCount: {
+    type: Number,
+    default: 0
   },
   dateRequested: {
     type: Date,

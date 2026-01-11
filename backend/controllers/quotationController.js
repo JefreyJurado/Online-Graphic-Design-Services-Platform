@@ -156,10 +156,10 @@ exports.getAllQuotations = async (req, res) => {
   }
 };
 
-// Update quotation status (Admin only)
+// Update quotation status (Admin only, except clients can request revisions)
 exports.updateQuotation = async (req, res) => {
   try {
-    const { status, quotedPrice, adminNotes } = req.body;
+    const { status, quotedPrice, adminNotes, revisionRequest, revisionFee, revisionCount } = req.body;
     
     const quotation = await Quotation.findById(req.params.id);
     
@@ -170,37 +170,60 @@ exports.updateQuotation = async (req, res) => {
       });
     }
     
-    // Update fields
-    if (status) quotation.status = status;
-    if (quotedPrice) quotation.quotedPrice = quotedPrice;
-    if (adminNotes) quotation.adminNotes = adminNotes;
-    
-    if (status && status !== 'pending') {
-      quotation.dateResponded = Date.now();
+    // Allow clients to request revisions on their own quotes
+    if (req.user.role === 'client') {
+      // Check if this is their quote
+      if (quotation.client && quotation.client.toString() !== req.user.id) {
+        return res.status(403).json({
+          success: false,
+          message: 'Not authorized to update this quotation'
+        });
+      }
+      
+      // Clients can ONLY request revisions
+      if (status !== 'revision_requested' || !revisionRequest) {
+        return res.status(403).json({
+          success: false,
+          message: 'Clients can only request revisions'
+        });
+      }
+      
+      // Update with revision request
+      quotation.status = 'revision_requested';
+      quotation.revisionRequest = revisionRequest;
+    } else {
+      // Admin can update everything
+      if (status) quotation.status = status;
+      if (quotedPrice) quotation.quotedPrice = quotedPrice;
+      if (adminNotes) quotation.adminNotes = adminNotes;
+      if (revisionFee) quotation.revisionFee = revisionFee;
+      if (revisionCount) quotation.revisionCount = quotation.revisionCount + 1;
+      if (revisionRequest !== undefined) quotation.revisionRequest = revisionRequest;
+      
+      if (status && status !== 'pending') {
+        quotation.dateResponded = Date.now();
+      }
     }
     
     await quotation.save();
-
+    
     await quotation.populate('service', 'name category price');
     if (quotation.client) {
       await quotation.populate('client', 'name email phone');
     }
-
+    
     // Send email notification
     try {
       await emailService.sendQuoteResponseEmail(quotation);
-      console.log('📧 Email notification sent!');
     } catch (emailError) {
-      console.error('❌ Email failed:', emailError);
+      console.error('Email notification failed:', emailError);
     }
-
+    
     res.status(200).json({
       success: true,
       message: 'Quotation updated successfully',
       quotation
     });
-
-    // Send email notification to client or guest
   } catch (error) {
     console.error('Update quotation error:', error);
     res.status(500).json({

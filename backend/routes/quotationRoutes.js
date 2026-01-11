@@ -22,7 +22,6 @@ const optionalAuth = async (req, res, next) => {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
       req.user = await User.findById(decoded.id).select('-password');
     } catch (error) {
-      // Invalid token, continue as guest
       req.user = null;
     }
   }
@@ -31,15 +30,15 @@ const optionalAuth = async (req, res, next) => {
 };
 
 // Public/Guest routes
-router.post('/', optionalAuth, createQuotation); // Guests can create quotes
+router.post('/', optionalAuth, createQuotation);
 
 // Protected client routes
 router.get('/my-quotations', protect, getMyQuotations);
 router.get('/:id', protect, getQuotationById);
 
-// Admin routes
+// Admin routes (but PUT allows clients for revisions)
 router.get('/', protect, adminOnly, getAllQuotations);
-router.put('/:id', protect, adminOnly, updateQuotation);
+router.put('/:id', protect, updateQuotation); // ← NO adminOnly here!
 router.delete('/:id', protect, adminOnly, deleteQuotation);
 
 module.exports = router;

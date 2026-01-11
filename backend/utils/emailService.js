@@ -21,8 +21,10 @@ exports.sendQuoteResponseEmail = async (quote) => {
       'reviewing': '👀',
       'quoted': '💰',
       'accepted': '✅',
-      'rejected': '❌',
-      'completed': '🎉'
+      'in_progress': '🚀',
+      'revision_requested': '🔄',
+      'completed': '🎉',
+      'rejected': '❌'
     };
     
     const emailHTML = `
@@ -56,7 +58,7 @@ exports.sendQuoteResponseEmail = async (quote) => {
             <p>Good news! We've updated your quote request for "<strong>${quote.projectName}</strong>".</p>
             
             <div class="status-badge status-${quote.status}">
-              ${statusEmojis[quote.status]} Status: ${quote.status.toUpperCase()}
+              ${statusEmojis[quote.status] || '📋'} Status: ${quote.status.replace('_', ' ').toUpperCase()}
             </div>
             
             <div class="info-box">
