@@ -4,7 +4,12 @@ const quotationSchema = new mongoose.Schema({
   client: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: true
+    required: false  // ← CHANGED: Now optional for guest users
+  },
+  guestInfo: {     // ← NEW: Store guest contact info
+    name: String,
+    email: String,
+    phone: String
   },
   service: {
     type: mongoose.Schema.Types.ObjectId,

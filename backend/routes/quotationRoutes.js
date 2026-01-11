@@ -10,8 +10,30 @@ const {
   deleteQuotation
 } = require('../controllers/quotationController');
 
-// Client routes (protected)
-router.post('/', protect, createQuotation);
+// Optional authentication middleware
+const optionalAuth = async (req, res, next) => {
+  const token = req.headers.authorization?.split(' ')[1];
+  
+  if (token) {
+    try {
+      const jwt = require('jsonwebtoken');
+      const User = require('../models/User');
+      
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      req.user = await User.findById(decoded.id).select('-password');
+    } catch (error) {
+      // Invalid token, continue as guest
+      req.user = null;
+    }
+  }
+  
+  next();
+};
+
+// Public/Guest routes
+router.post('/', optionalAuth, createQuotation); // Guests can create quotes
+
+// Protected client routes
 router.get('/my-quotations', protect, getMyQuotations);
 router.get('/:id', protect, getQuotationById);
 

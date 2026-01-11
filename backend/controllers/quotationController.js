@@ -1,10 +1,11 @@
 const Quotation = require('../models/Quotation');
 const Service = require('../models/Service');
+const emailService = require('../utils/emailService');
 
-// Create new quotation request (Client)
+// Create new quotation request (Client or Guest)
 exports.createQuotation = async (req, res) => {
   try {
-    const { service, projectName, description, budget, deadline, additionalInfo } = req.body;
+    const { service, projectName, description, budget, deadline, additionalInfo, guestName, guestEmail, guestPhone } = req.body;
     
     // Validation
     if (!service || !projectName || !description || !budget || !deadline) {
@@ -23,29 +24,51 @@ exports.createQuotation = async (req, res) => {
       });
     }
     
+    // Determine if this is a guest or logged-in user
+    let clientId = null;
+    let guestInfo = {};
+    
+    if (req.user) {
+      // Logged-in user
+      clientId = req.user.id;
+    } else {
+      // Guest user - validate guest info
+      if (!guestName || !guestEmail) {
+        return res.status(400).json({
+          success: false,
+          message: 'Guest users must provide name and email'
+        });
+      }
+      guestInfo = {
+        name: guestName,
+        email: guestEmail,
+        phone: guestPhone || ''
+      };
+    }
+    
     // Create quotation
     const quotation = await Quotation.create({
-      client: req.user.id,
+      client: clientId, // Will be null for guests
       service,
       projectName,
       description,
       budget,
       deadline,
-      additionalInfo: additionalInfo || ''
+      additionalInfo: additionalInfo || '',
+      guestInfo: clientId ? undefined : guestInfo // Only store guest info if not logged in
     });
     
-    // Populate service and client info
+    // Populate service info
     await quotation.populate('service', 'name category price');
-    await quotation.populate('client', 'name email phone');
+    if (clientId) {
+      await quotation.populate('client', 'name email phone');
+    }
     
-    // Send response
     res.status(201).json({
       success: true,
       message: 'Quotation request submitted successfully',
       quotation
     });
-
-    // Error handling
   } catch (error) {
     console.error('Create quotation error:', error);
     res.status(500).json({
@@ -91,7 +114,7 @@ exports.getQuotationById = async (req, res) => {
     }
     
     // Check if user is authorized (client owns it or user is admin)
-    if (quotation.client._id.toString() !== req.user.id && req.user.role !== 'admin') {
+    if (quotation.client && quotation.client._id.toString() !== req.user.id && req.user.role !== 'admin') {
       return res.status(403).json({
         success: false,
         message: 'Not authorized to view this quotation'
@@ -157,15 +180,27 @@ exports.updateQuotation = async (req, res) => {
     }
     
     await quotation.save();
-    
+
     await quotation.populate('service', 'name category price');
-    await quotation.populate('client', 'name email phone');
-    
+    if (quotation.client) {
+      await quotation.populate('client', 'name email phone');
+    }
+
+    // Send email notification
+    try {
+      await emailService.sendQuoteResponseEmail(quotation);
+      console.log('📧 Email notification sent!');
+    } catch (emailError) {
+      console.error('❌ Email failed:', emailError);
+    }
+
     res.status(200).json({
       success: true,
       message: 'Quotation updated successfully',
       quotation
     });
+
+    // Send email notification to client or guest
   } catch (error) {
     console.error('Update quotation error:', error);
     res.status(500).json({

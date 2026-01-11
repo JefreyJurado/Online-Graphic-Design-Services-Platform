@@ -56,12 +56,18 @@
         <li class="nav-item">
           <a class="nav-link active" href="05_contact.html">Contact</a>
         </li>
+        <li class="nav-item">
+          <a class="nav-link" href="services.html">Services</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="login.html">Login</a>
+        </li>
       </ul>
     </div>
   </div>
 </nav>
 
-   <!-- Contact Section -->
+<!-- Contact Section -->
 <main>
   <section class="contact">
     <h2>Let's Work Together</h2>
@@ -72,9 +78,16 @@
       <span>Currently available for new projects</span>
     </div>
     
-    <p>Feel free to reach out via email or connect with me on professional platforms.</p>
+    <!-- SIMPLER GUIDANCE - CLEANER VERSION -->
+    <p style="text-align: center; margin: 1.5rem auto 2rem; max-width: 700px; font-size: 1.05rem; line-height: 1.7;">
+      Need a design service? 
+      <a href="services.html" style="color: #50c2f7; font-weight: 600;">Browse services</a> 
+      and 
+      <a href="request-quote.html" style="color: #50c2f7; font-weight: 600;">request a quote</a>.<br>
+      <span style="font-size: 0.95rem;">For general inquiries or collaboration, use the form below.</span>
+    </p>
 
-    <!-- Contact Form - FORMSPREE REMOVED -->
+    <!-- Contact Form -->
     <div class="contact-form-wrapper">
       <h3>Send me a message</h3>
       <form class="contact-form" id="contactForm">
@@ -96,39 +109,38 @@
       </div>
     </div>
 
-    <!-- Updated Contact Links - FIXED ORDER -->
-<div class="contact-links">
+    <!-- Contact Links -->
+    <div class="contact-links">
+      <a href="https://www.linkedin.com/in/jefrey-jurado-630576166/" class="contact-card" target="_blank">
+        <i class="fab fa-linkedin"></i>
+        <span>LinkedIn</span>
+        <small>Professional profile</small>
+      </a>
 
-  <a href="https://www.linkedin.com/in/jefrey-jurado-630576166/" class="contact-card" target="_blank">
-    <i class="fab fa-linkedin"></i>
-    <span>LinkedIn</span>
-    <small>Professional profile</small>
-  </a>
+      <a href="https://github.com/JefreyJurado" class="contact-card" target="_blank">
+        <i class="fab fa-github"></i>
+        <span>GitHub</span>
+        <small>Code & projects</small>
+      </a>
 
-  <a href="https://github.com/JefreyJurado" class="contact-card" target="_blank">
-    <i class="fab fa-github"></i>
-    <span>GitHub</span>
-    <small>Code & projects</small>
-  </a>
+      <a href="mailto:apollojudge0@gmail.com" class="contact-card" id="emailLink">
+        <i class="fas fa-envelope"></i>
+        <span>Email</span>
+        <small>apollojudge0@gmail.com</small>
+      </a>
 
-  <a href="mailto:apollojudge0@gmail.com" class="contact-card" id="emailLink">
-    <i class="fas fa-envelope"></i>
-    <span>Email</span>
-    <small>apollojudge0@gmail.com</small>
-  </a>
+      <a href="https://www.behance.net/jefreyjuradocreative" class="contact-card" target="_blank">
+        <i class="fab fa-behance"></i>
+        <span>Behance</span>
+        <small>Design portfolio</small>
+      </a>
 
-  <a href="https://www.behance.net/jefreyjuradocreative" class="contact-card" target="_blank">
-    <i class="fab fa-behance"></i>
-    <span>Behance</span>
-    <small>Design portfolio</small>
-  </a>
-
-  <a href="https://www.facebook.com/login" class="contact-card" target="_blank">
-    <i class="fab fa-facebook"></i>
-    <span>Facebook</span>
-    <small>Social Media</small>
-  </a>
-</div>
+      <a href="https://www.facebook.com/login" class="contact-card" target="_blank">
+        <i class="fab fa-facebook"></i>
+        <span>Facebook</span>
+        <small>Social Media</small>
+      </a>
+    </div>
 
     <!-- Response Time Info -->
     <div class="response-info">
@@ -138,16 +150,16 @@
   </section>
 </main>
 
-  <!-- Footer -->
-  <footer>
+<!-- Footer -->
+<footer>
   <p>© 2025 Jefrey Jurado. All rights reserved.</p>
 </footer>
 
-<!-- Add EmailJS SDK -->
+<!-- EmailJS SDK -->
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 
 <script>
-  // Initialize EmailJS with your credentials
+  // Initialize EmailJS
   emailjs.init("qSWCCgKjgh0QdaY2Y");
   
   document.getElementById('contactForm').addEventListener('submit', function(e) {
@@ -178,30 +190,24 @@
         });
       })
       .then(() => {
-        // Success - show message
+        // Success
         document.getElementById('successMessage').style.display = 'block';
         this.reset();
         
-        // Hide success message after 5 seconds
         setTimeout(function() {
           document.getElementById('successMessage').style.display = 'none';
         }, 5000);
       })
       .catch((error) => {
-        showToast('❌ Failed to send message. Please try again.');
+        alert('❌ Failed to send message. Please try again.');
         console.error('EmailJS error:', error);
       })
       .finally(() => {
-        // Reset button
         submitBtn.innerHTML = originalText;
         submitBtn.disabled = false;
       });
-      
-    } else {
-      showToast('❌ Please fill in all fields');
     }
     
-    // Stop other form handlers
     e.stopImmediatePropagation();
     return false;
   });

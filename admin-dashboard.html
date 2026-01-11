@@ -408,7 +408,7 @@
 </div>
 
 <footer>
-  <p>© 2025 Jefrey Jurado. All rights reserved.</p>
+  <p>© 2026 Jefrey Jurado. All rights reserved.</p>
 </footer>
 
 <script>
@@ -485,7 +485,7 @@
     }
   }
   
-  // Display quotations
+  // Display quotations (UPDATED TO HANDLE GUEST QUOTES)
   function displayQuotations(quotations) {
     const container = document.getElementById('quotesContainer');
     
@@ -516,8 +516,11 @@
           <div>
             <div class="quote-title">${quote.projectName}</div>
             <p style="color: #ddd; margin: 0; font-size: 0.9rem;">
-              Client: <strong>${quote.client.name}</strong> (${quote.client.email})
+              Client: <strong>${quote.client ? quote.client.name : quote.guestInfo.name}</strong> 
+              (${quote.client ? quote.client.email : quote.guestInfo.email})
+              ${!quote.client ? '<span style="background: #ff9800; color: #000; padding: 0.2rem 0.5rem; border-radius: 10px; font-size: 0.75rem; margin-left: 0.5rem; font-weight: 600;">GUEST</span>' : ''}
             </p>
+            ${quote.guestInfo && quote.guestInfo.phone ? `<p style="color: #ddd; margin: 0; font-size: 0.9rem;"><strong>Phone:</strong> ${quote.guestInfo.phone}</p>` : ''}
             <p style="color: #ddd; margin: 0; font-size: 0.9rem;">
               Service: <strong>${quote.service.name}</strong>
             </p>
