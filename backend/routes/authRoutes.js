@@ -13,7 +13,6 @@ router.put('/change-password', protect, async (req, res) => {
   try {
     const { currentPassword, newPassword } = req.body;
 
-    // Validation
     if (!currentPassword || !newPassword) {
       return res.status(400).json({ 
         success: false, 
@@ -28,7 +27,6 @@ router.put('/change-password', protect, async (req, res) => {
       });
     }
 
-    // Get user with password (FIXED)
     const user = await User.findById(req.user.id);
     
     if (!user) {
@@ -38,7 +36,6 @@ router.put('/change-password', protect, async (req, res) => {
       });
     }
 
-    // Check current password (FIXED - get password from DB first)
     const userWithPassword = await User.findById(req.user.id).select('+password');
     const isMatch = await bcrypt.compare(currentPassword, userWithPassword.password);
     
@@ -49,11 +46,9 @@ router.put('/change-password', protect, async (req, res) => {
       });
     }
 
-    // Hash new password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(newPassword, salt);
 
-    // Update password directly with findByIdAndUpdate (FIXED)
     await User.findByIdAndUpdate(req.user.id, { 
       password: hashedPassword 
     });
@@ -71,3 +66,5 @@ router.put('/change-password', protect, async (req, res) => {
     });
   }
 });
+
+module.exports = router;
