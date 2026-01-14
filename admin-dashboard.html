@@ -350,6 +350,30 @@
     </div>
   </div>
 
+   <!-- Change Password Section -->
+  <div style="max-width: 600px; margin: 2rem auto 3rem auto;">
+    <div style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); padding: 2rem; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.2);">
+      <h3 style="color: #50c2f7; margin-bottom: 1.5rem;">🔒 Change Password</h3>
+      <form id="changePasswordForm">
+        <div class="form-group">
+          <label for="currentPassword">Current Password</label>
+          <input type="password" id="currentPassword" required>
+        </div>
+        <div class="form-group">
+          <label for="newPassword">New Password</label>
+          <input type="password" id="newPassword" required minlength="6">
+          <small style="color: #ddd;">Minimum 6 characters</small>
+        </div>
+        <div class="form-group">
+          <label for="confirmPassword">Confirm New Password</label>
+          <input type="password" id="confirmPassword" required>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Change Password</button>
+        <div id="passwordMessage" style="margin-top: 1rem;"></div>
+      </form>
+    </div>
+  </div> 
+
   <!-- Quotation Management -->
   <h2 class="section-title">
     💬 Quotation Management
@@ -822,6 +846,45 @@ async function rejectRevision(quoteId) {
     alert('❌ Error rejecting revision');
   }
 }
+
+// Change Password Handler
+document.getElementById('changePasswordForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  
+  const currentPassword = document.getElementById('currentPassword').value;
+  const newPassword = document.getElementById('newPassword').value;
+  const confirmPassword = document.getElementById('confirmPassword').value;
+  const messageDiv = document.getElementById('passwordMessage');
+  
+  // Validate passwords match
+  if (newPassword !== confirmPassword) {
+    messageDiv.innerHTML = '<div style="background: #f44336; color: white; padding: 1rem; border-radius: 5px;">New passwords do not match</div>';
+    return;
+  }
+  
+  try {
+    const response = await fetch(`${API_URL}/auth/change-password`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ currentPassword, newPassword })
+    });
+    
+    const data = await response.json();
+    
+    if (data.success) {
+      messageDiv.innerHTML = '<div style="background: #4CAF50; color: white; padding: 1rem; border-radius: 5px;">Password changed successfully!</div>';
+      document.getElementById('changePasswordForm').reset();
+    } else {
+      messageDiv.innerHTML = `<div style="background: #f44336; color: white; padding: 1rem; border-radius: 5px;">${data.message}</div>`;
+    }
+  } catch (error) {
+    console.error('Change password error:', error);
+    messageDiv.innerHTML = '<div style="background: #f44336; color: white; padding: 1rem; border-radius: 5px;">Failed to change password</div>';
+  }
+});
 
 </script>
 </body>

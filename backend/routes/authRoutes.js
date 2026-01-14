@@ -1,8 +1,63 @@
 const express = require('express');
 const router = express.Router();
+const bcrypt = require('bcryptjs');
+const User = require('../models/User');
 const authController = require('../controllers/authController');
+const { protect } = require('../middleware/authMiddleware');
 
 router.post('/register', authController.register);
 router.post('/login', authController.login);
+
+// Change Password Route
+router.put('/change-password', protect, async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+
+    // Validation
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Please provide current and new password' 
+      });
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'New password must be at least 6 characters' 
+      });
+    }
+
+    // Get user with password
+    const user = await User.findById(req.user.id).select('+password');
+
+    // Check current password
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ 
+        success: false, 
+        message: 'Current password is incorrect' 
+      });
+    }
+
+    // Hash new password
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(newPassword, salt);
+
+    await user.save();
+
+    res.json({ 
+      success: true, 
+      message: 'Password changed successfully' 
+    });
+
+  } catch (error) {
+    console.error('Change password error:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Server error' 
+    });
+  }
+});
 
 module.exports = router;
