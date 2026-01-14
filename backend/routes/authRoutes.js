@@ -28,11 +28,20 @@ router.put('/change-password', protect, async (req, res) => {
       });
     }
 
-    // Get user with password
-    const user = await User.findById(req.user.id).select('+password');
+    // Get user with password (FIXED)
+    const user = await User.findById(req.user.id);
+    
+    if (!user) {
+      return res.status(404).json({ 
+        success: false, 
+        message: 'User not found' 
+      });
+    }
 
-    // Check current password
-    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    // Check current password (FIXED - get password from DB first)
+    const userWithPassword = await User.findById(req.user.id).select('+password');
+    const isMatch = await bcrypt.compare(currentPassword, userWithPassword.password);
+    
     if (!isMatch) {
       return res.status(401).json({ 
         success: false, 
@@ -42,9 +51,12 @@ router.put('/change-password', protect, async (req, res) => {
 
     // Hash new password
     const salt = await bcrypt.genSalt(10);
-    user.password = await bcrypt.hash(newPassword, salt);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
 
-    await user.save();
+    // Update password directly with findByIdAndUpdate (FIXED)
+    await User.findByIdAndUpdate(req.user.id, { 
+      password: hashedPassword 
+    });
 
     res.json({ 
       success: true, 
@@ -55,9 +67,7 @@ router.put('/change-password', protect, async (req, res) => {
     console.error('Change password error:', error);
     res.status(500).json({ 
       success: false, 
-      message: 'Server error' 
+      message: 'Server error: ' + error.message 
     });
   }
 });
-
-module.exports = router;
