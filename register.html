@@ -200,7 +200,9 @@
 </footer>
 
 <script>
-  const API_URL = 'http://localhost:5000/api';
+  const API_URL = window.location.hostname === 'localhost'
+  ? 'http://localhost:5000/api'
+  : 'https://online-graphic-design-services-platform-bpq56eokl.vercel.app/api';
   
   const registerForm = document.getElementById('registerForm');
   const submitBtn = document.getElementById('submitBtn');
