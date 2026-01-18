@@ -25,13 +25,18 @@ connectDB();
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/services', require('./routes/serviceRoutes'));
 app.use('/api/quotations', require('./routes/quotationRoutes'));
+app.use('/api/unsplash', require('./routes/unsplash')); 
 
 app.get('/', (req, res) => {
   res.json({
     message: 'Design Platform API Running',
     endpoints: {
       register: 'POST /api/auth/register',
-      login: 'POST /api/auth/login'
+      login: 'POST /api/auth/login',
+      services: 'GET /api/services',
+      quotations: 'GET /api/quotations',
+      unsplashSearch: 'GET /api/unsplash/search?query=logo',
+      unsplashRandom: 'GET /api/unsplash/random?count=5'
     }
   });
 });
