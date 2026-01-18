@@ -1,6 +1,6 @@
 // Unsplash Image Search Integration
 // API Configuration
-const API_BASE_URL = 'http://localhost:5000/api'; // Change to your production URL later
+const API_BASE_URL = 'https://online-graphic-design-services-plat.vercel.app'; // Change to your production URL later
 
 // State management
 let searchTimeout = null;
