@@ -162,8 +162,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-
-
 // PROJECTS MODAL SLIDESHOW
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -402,8 +400,6 @@ document.addEventListener("DOMContentLoaded", () => {
     observer.observe(section);
   });
 });
-
-
 
 // WebP for CSS Backgrounds & Thumbnails
 if (supportsWebP) {

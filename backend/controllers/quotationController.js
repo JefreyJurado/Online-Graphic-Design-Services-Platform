@@ -5,7 +5,18 @@ const emailService = require('../utils/emailService');
 // Create new quotation request (Client or Guest)
 exports.createQuotation = async (req, res) => {
   try {
-    const { service, projectName, description, budget, deadline, additionalInfo, guestName, guestEmail, guestPhone } = req.body;
+    const { 
+      service, 
+      projectName, 
+      description, 
+      budget, 
+      deadline, 
+      additionalInfo, 
+      guestName, 
+      guestEmail, 
+      guestPhone,
+      referenceImages  // ← NEW: Accept reference images
+    } = req.body;
     
     // Validation
     if (!service || !projectName || !description || !budget || !deadline) {
@@ -48,14 +59,15 @@ exports.createQuotation = async (req, res) => {
     
     // Create quotation
     const quotation = await Quotation.create({
-      client: clientId, // Will be null for guests
+      client: clientId,
       service,
       projectName,
       description,
       budget,
       deadline,
       additionalInfo: additionalInfo || '',
-      guestInfo: clientId ? undefined : guestInfo // Only store guest info if not logged in
+      guestInfo: clientId ? undefined : guestInfo,
+      referenceImages: referenceImages || []  // ← NEW: Include reference images
     });
     
     // Populate service info
@@ -71,6 +83,15 @@ exports.createQuotation = async (req, res) => {
     });
   } catch (error) {
     console.error('Create quotation error:', error);
+    
+    // ← NEW: Handle max images error
+    if (error.message && error.message.includes('Maximum 5 reference images')) {
+      return res.status(400).json({
+        success: false,
+        message: error.message
+      });
+    }
+    
     res.status(500).json({
       success: false,
       message: 'Error creating quotation request'
@@ -229,6 +250,152 @@ exports.updateQuotation = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Error updating quotation'
+    });
+  }
+};
+
+// ===== NEW: Add images to quotation =====
+exports.addImagesToQuotation = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { images } = req.body;
+    
+    // Validate images array
+    if (!images || !Array.isArray(images) || images.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide an array of images to add'
+      });
+    }
+    
+    // Find quotation
+    const quotation = await Quotation.findById(id);
+    if (!quotation) {
+      return res.status(404).json({
+        success: false,
+        message: 'Quotation not found'
+      });
+    }
+    
+    // Check authorization (owner only)
+    if (quotation.client && quotation.client.toString() !== req.user.id) {
+      return res.status(403).json({
+        success: false,
+        message: 'You do not have permission to modify this quotation'
+      });
+    }
+    
+    // Check status (cannot modify completed or in_progress)
+    if (quotation.status === 'completed' || quotation.status === 'in_progress') {
+      return res.status(403).json({
+        success: false,
+        message: 'Cannot modify images on completed or in-progress quotations'
+      });
+    }
+    
+    // Check total count
+    const totalAfterAdd = quotation.referenceImages.length + images.length;
+    if (totalAfterAdd > 5) {
+      return res.status(400).json({
+        success: false,
+        message: `Cannot add ${images.length} image(s). Maximum is 5 total (currently ${quotation.referenceImages.length})`
+      });
+    }
+    
+    // Add images
+    quotation.referenceImages.push(...images);
+    quotation.updatedAt = new Date();
+    await quotation.save();
+    
+    // Populate and return
+    await quotation.populate('service', 'name category price');
+    if (quotation.client) {
+      await quotation.populate('client', 'name email phone');
+    }
+    
+    res.json({
+      success: true,
+      message: `${images.length} image(s) added successfully`,
+      quotation,
+      imagesAdded: images.length
+    });
+  } catch (error) {
+    console.error('Add images error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to add images',
+      error: error.message
+    });
+  }
+};
+
+// ===== NEW: Remove images from quotation =====
+exports.removeImagesFromQuotation = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { imageIds } = req.body;
+    
+    // Validate imageIds array
+    if (!imageIds || !Array.isArray(imageIds) || imageIds.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide an array of image IDs to remove'
+      });
+    }
+    
+    // Find quotation
+    const quotation = await Quotation.findById(id);
+    if (!quotation) {
+      return res.status(404).json({
+        success: false,
+        message: 'Quotation not found'
+      });
+    }
+    
+    // Check authorization (owner only)
+    if (quotation.client && quotation.client.toString() !== req.user.id) {
+      return res.status(403).json({
+        success: false,
+        message: 'You do not have permission to modify this quotation'
+      });
+    }
+    
+    // Check status
+    if (quotation.status === 'completed' || quotation.status === 'in_progress') {
+      return res.status(403).json({
+        success: false,
+        message: 'Cannot modify images on completed or in-progress quotations'
+      });
+    }
+    
+    // Remove images by unsplashId
+    const originalCount = quotation.referenceImages.length;
+    quotation.referenceImages = quotation.referenceImages.filter(
+      img => !imageIds.includes(img.unsplashId)
+    );
+    const removedCount = originalCount - quotation.referenceImages.length;
+    
+    quotation.updatedAt = new Date();
+    await quotation.save();
+    
+    // Populate and return
+    await quotation.populate('service', 'name category price');
+    if (quotation.client) {
+      await quotation.populate('client', 'name email phone');
+    }
+    
+    res.json({
+      success: true,
+      message: `${removedCount} image(s) removed successfully`,
+      quotation,
+      imagesRemoved: removedCount
+    });
+  } catch (error) {
+    console.error('Remove images error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to remove images',
+      error: error.message
     });
   }
 };

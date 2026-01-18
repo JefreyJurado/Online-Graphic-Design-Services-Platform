@@ -1,13 +1,16 @@
 const express = require('express');
 const router = express.Router();
 const { protect, adminOnly } = require('../middleware/authMiddleware');
+const { validateReferenceImages } = require('../validators/imageValidator'); // ← NEW
 const {
   createQuotation,
   getMyQuotations,
   getQuotationById,
   getAllQuotations,
   updateQuotation,
-  deleteQuotation
+  deleteQuotation,
+  addImagesToQuotation,      // ← NEW
+  removeImagesFromQuotation  // ← NEW
 } = require('../controllers/quotationController');
 
 // Optional authentication middleware
@@ -30,15 +33,19 @@ const optionalAuth = async (req, res, next) => {
 };
 
 // Public/Guest routes
-router.post('/', optionalAuth, createQuotation);
+router.post('/', optionalAuth, validateReferenceImages, createQuotation); // ← UPDATED: Added validation
 
 // Protected client routes
 router.get('/my-quotations', protect, getMyQuotations);
 router.get('/:id', protect, getQuotationById);
 
+// ===== NEW: Image management routes =====
+router.patch('/:id/images/add', protect, validateReferenceImages, addImagesToQuotation);
+router.patch('/:id/images/remove', protect, removeImagesFromQuotation);
+
 // Admin routes (but PUT allows clients for revisions)
 router.get('/', protect, adminOnly, getAllQuotations);
-router.put('/:id', protect, updateQuotation); // ← NO adminOnly here!
+router.put('/:id', protect, updateQuotation);
 router.delete('/:id', protect, adminOnly, deleteQuotation);
 
 module.exports = router;

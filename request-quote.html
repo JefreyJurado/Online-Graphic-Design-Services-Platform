@@ -456,14 +456,15 @@
   quoteForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     
-    const formData = {
-      service: document.getElementById('service').value,
-      projectName: document.getElementById('projectName').value.trim(),
-      description: document.getElementById('description').value.trim(),
-      budget: document.getElementById('budget').value,
-      deadline: document.getElementById('deadline').value,
-      additionalInfo: document.getElementById('additionalInfo').value.trim()
-    };
+      const formData = {
+    service: document.getElementById('service').value,
+    projectName: document.getElementById('projectName').value.trim(),
+    description: document.getElementById('description').value.trim(),
+    budget: document.getElementById('budget').value,
+    deadline: document.getElementById('deadline').value,
+    additionalInfo: document.getElementById('additionalInfo').value.trim(),
+    referenceImages: window.getSelectedImages ? window.getSelectedImages() : []  // ← ADD THIS LINE
+  };
     
     // Add guest contact info if not logged in
     if (!isLoggedIn) {
@@ -508,10 +509,13 @@
       
           if (data.success) {
       // Show success message
+      const imageCount = formData.referenceImages.length;
+      const imageText = imageCount > 0 ? `<br><small>✨ ${imageCount} reference image${imageCount > 1 ? 's' : ''} attached</small>` : '';
+      
       if (isLoggedIn) {
-        successMsg.innerHTML = '✅ Quote request submitted successfully!<br>View it in your <a href="client-dashboard.html" style="color: white; text-decoration: underline;">dashboard</a>.';
+        successMsg.innerHTML = `✅ Quote request submitted successfully!${imageText}<br>View it in your <a href="client-dashboard.html" style="color: white; text-decoration: underline;">dashboard</a>.`;
       } else {
-        successMsg.innerHTML = '✅ Quote request submitted successfully!<br>We\'ll contact you at <strong>' + formData.guestEmail + '</strong> within 24 hours.<br><small>Want to track your quote? <a href="register.html" style="color: white; text-decoration: underline;">Create an account</a></small>';
+        successMsg.innerHTML = `✅ Quote request submitted successfully!${imageText}<br>We'll contact you at <strong>${formData.guestEmail}</strong> within 24 hours.<br><small>Want to track your quote? <a href="register.html" style="color: white; text-decoration: underline;">Create an account</a></small>`;
       }
       successMsg.style.display = 'block';
       quoteForm.reset();
@@ -557,6 +561,10 @@
   
   // Load services on page load
   loadServices();
+
+
 </script>
+<!-- Unsplash Image Search Integration -->
+<script src="unsplash-integration.js"></script>
 </body>
 </html>
