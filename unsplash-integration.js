@@ -1,6 +1,6 @@
 // Unsplash Image Search Integration
 // API Configuration
-const API_BASE_URL = 'https://your-actual-backend.vercel.app';// Change to your production URL later
+const API_BASE_URL = 'https://online-graphic-design-services-plat.vercel.app'// Change to your production URL later
 
 // State management
 let searchTimeout = null;
@@ -38,10 +38,10 @@ function addImageSearchToForm() {
   const imageSection = document.createElement('div');
   imageSection.className = 'image-search-section';
   imageSection.innerHTML = `
-    <h3>Add Reference Images (Optional)</h3>
-    <p style="color: #666; margin-bottom: 1rem;">
-      Search for design inspiration from Unsplash (max 5 images)
-    </p>
+<h3 style="color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">Add Reference Images (Optional)</h3>
+<p style="color: #ddd; margin-bottom: 1rem; text-shadow: 0 1px 2px rgba(0,0,0,0.5);">
+  Search for design inspiration from Unsplash (max 5 images)
+</p>
     
     <!-- Search Bar -->
     <div class="image-search-bar">
@@ -128,10 +128,10 @@ function setupImageSearchListeners() {
 
 // Search images from Unsplash API
 async function searchImages(query) {
+  const perPage = 12; // Number of results to fetch
+  
   try {
-    const response = await fetch(
-      `${API_BASE_URL}/unsplash/search?query=${encodeURIComponent(query)}&per_page=12`
-    );
+    const response = await fetch(`${API_BASE_URL}/api/unsplash/search?query=${query}&per_page=${perPage}`);
     
     const data = await response.json();
     document.getElementById('searchLoader').style.display = 'none';
@@ -162,8 +162,8 @@ function displaySearchResults(images) {
   
   resultsContainer.innerHTML = `
     <div style="margin: 1rem 0;">
-      <p style="color: #666;">Showing ${images.length} results</p>
-    </div>
+  <p style="color: #fff;">Showing ${images.length} results</p>
+</div>
     <div class="image-gallery-grid">
       ${images.map(image => createImageCard(image)).join('')}
     </div>
@@ -316,12 +316,13 @@ function addImageSearchStyles() {
   const style = document.createElement('style');
   style.id = 'unsplash-styles';
   style.textContent = `
-    .image-search-section {
-      margin: 2rem 0;
-      padding: 1.5rem;
-      background: #f8f9fa;
-      border-radius: 8px;
-    }
+  .image-search-section {
+    margin: 2rem 0;
+    padding: 1.5rem;
+    background: rgba(255, 255, 255, 0.15);  /* ← Semi-transparent white */
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.3);  /* ← Add border */
+  }
     
     .image-search-bar {
       position: relative;
