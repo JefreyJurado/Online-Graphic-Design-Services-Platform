@@ -1,3 +1,4 @@
+console.log('📍 unsplash.js route file is being loaded');
 const express = require('express');
 const router = express.Router();
 const rateLimit = require('express-rate-limit');

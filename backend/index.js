@@ -25,7 +25,15 @@ connectDB();
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/services', require('./routes/serviceRoutes'));
 app.use('/api/quotations', require('./routes/quotationRoutes'));
-app.use('/api/unsplash', require('./routes/unsplash')); 
+// Debug: Load Unsplash routes
+console.log('🔍 Attempting to load Unsplash routes...');
+try {
+  const unsplashRoutes = require('./routes/unsplash');
+  app.use('/api/unsplash', unsplashRoutes);
+  console.log('✅ Unsplash routes loaded successfully');
+} catch (error) {
+  console.error('❌ Failed to load Unsplash routes:', error);
+}
 
 app.get('/', (req, res) => {
   res.json({
