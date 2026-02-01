@@ -22,6 +22,10 @@ const userSchema = new mongoose.Schema({
     enum: ['client', 'admin'],
     default: 'client'
   },
+  profilePicture: { 
+    type: String,
+    default: null
+  },
   phone: String,
   address: String,
   dateRegistered: {
