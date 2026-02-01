@@ -15,7 +15,7 @@
       box-sizing: border-box;
     }
     
-      body {
+    body {
       font-family: 'Open Sans', Arial, sans-serif;
       background: linear-gradient(135deg, #1C4D8C, #000);
       min-height: 100vh;
@@ -44,7 +44,6 @@
       display: flex;
       gap: 1rem;
       align-items: center;
-      
     }
 
     .nav-right span {
@@ -85,6 +84,51 @@
     .welcome-card h1 {
       color: #50c2f7;
       margin-bottom: 1rem;
+    }
+
+    /* Profile Picture Styles */
+    .user-profile {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .profile-pic {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid #50c2f7;
+    }
+
+    .profile-pic-placeholder {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+      border: 3px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .upload-profile-btn {
+      display: inline-block;
+      padding: 8px 16px;
+      background: #50c2f7;
+      color: #000;
+      text-decoration: none;
+      border-radius: 5px;
+      font-size: 14px;
+      font-weight: 600;
+      transition: background 0.3s;
+    }
+
+    .upload-profile-btn:hover {
+      background: #1C4D8C;
+      color: white;
     }
 
     .dashboard-grid {
@@ -232,7 +276,7 @@
 
 <nav>
   <div class="nav-left">
-  Client Panel
+    Client Panel
   </div>
   <div class="nav-right">
     <span>Welcome, <strong id="userName">User</strong></span>
@@ -242,12 +286,20 @@
 
 <main>
   <div class="welcome-card">
-    <h1>👋 Welcome to Your Dashboard!</h1>
+    <!-- Profile Picture Section -->
+    <div class="user-profile">
+      <div id="profilePicContainer"></div>
+      <div>
+        <h1 id="welcomeMessage">👋 Welcome!</h1>
+        <a href="upload-profile.html" class="upload-profile-btn">📸 Upload Profile Picture</a>
+      </div>
+    </div>
+    
     <p>You're logged in as: <strong id="userEmail"></strong></p>
     <p>Role: <strong id="userRole"></strong></p>
   </div>
 
-    <!-- Change Password Section -->
+  <!-- Change Password Section -->
   <div style="max-width: 600px; margin: 0 auto 3rem auto;">
     <div style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); padding: 2rem; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.2);">
       <h3 style="color: #50c2f7; margin-bottom: 1.5rem;">🔒 Change Password</h3>
@@ -297,7 +349,7 @@
     </div>
   </div>
 
-  <!-- MY QUOTES SECTION - NEW! -->
+  <!-- MY QUOTES SECTION -->
   <div style="margin-top: 3rem;">
     <h2 style="color: #50c2f7; margin-bottom: 2rem;">📝 My Quote Requests</h2>
     
@@ -356,19 +408,40 @@
 
 <script>
   const API_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-  ? 'http://localhost:5000/api'
-  : 'https://online-graphic-design-services-plat.vercel.app/api';
+    ? 'http://localhost:5000/api'
+    : 'https://online-graphic-design-services-plat.vercel.app/api';
+  
   // Check if user is logged in
   const token = localStorage.getItem('token');
   const user = JSON.parse(localStorage.getItem('user') || '{}');
   
-    if (!token) {
-      window.location.href = 'login.html';
-    } else {
-      document.getElementById('userName').textContent = user.name || 'User';
-      document.getElementById('userEmail').textContent = user.email || 'N/A';
-      document.getElementById('userRole').textContent = user.role || 'client';
+  if (!token) {
+    window.location.href = 'login.html';
+  } else {
+    document.getElementById('userName').textContent = user.name || 'User';
+    document.getElementById('userEmail').textContent = user.email || 'N/A';
+    document.getElementById('userRole').textContent = user.role || 'client';
+  }
+
+  // Display user profile picture
+  function displayUserProfile() {
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    const profilePicContainer = document.getElementById('profilePicContainer');
+    const welcomeMessage = document.getElementById('welcomeMessage');
+    
+    if (user.name) {
+      welcomeMessage.textContent = `👋 Welcome, ${user.name}!`;
     }
+    
+    if (user.profilePicture) {
+      profilePicContainer.innerHTML = `<img src="${user.profilePicture}" alt="Profile" class="profile-pic">`;
+    } else {
+      profilePicContainer.innerHTML = `<div class="profile-pic-placeholder">👤</div>`;
+    }
+  }
+
+  // Call on page load
+  window.addEventListener('DOMContentLoaded', displayUserProfile);
   
   function logout() {
     if (confirm('Are you sure you want to logout?')) {
@@ -402,7 +475,7 @@
     }
   }
   
-// Display quotes
+  // Display quotes
   function displayQuotes(quotations) {
     const container = document.getElementById('quotesContainer');
     container.style.display = 'block';
@@ -552,44 +625,43 @@
   fetchMyQuotes();
 
   // Change Password Handler
-document.getElementById('changePasswordForm').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  
-  const currentPassword = document.getElementById('currentPassword').value;
-  const newPassword = document.getElementById('newPassword').value;
-  const confirmPassword = document.getElementById('confirmPassword').value;
-  const messageDiv = document.getElementById('passwordMessage');
-  
-  // Validate passwords match
-  if (newPassword !== confirmPassword) {
-    messageDiv.innerHTML = '<div style="background: #f44336; color: white; padding: 1rem; border-radius: 5px;">New passwords do not match</div>';
-    return;
-  }
-  
-  try {
-    const response = await fetch(`${API_URL}/auth/change-password`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify({ currentPassword, newPassword })
-    });
+  document.getElementById('changePasswordForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
     
-    const data = await response.json();
+    const currentPassword = document.getElementById('currentPassword').value;
+    const newPassword = document.getElementById('newPassword').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+    const messageDiv = document.getElementById('passwordMessage');
     
-    if (data.success) {
-      messageDiv.innerHTML = '<div style="background: #4CAF50; color: white; padding: 1rem; border-radius: 5px;">Password changed successfully!</div>';
-      document.getElementById('changePasswordForm').reset();
-    } else {
-      messageDiv.innerHTML = `<div style="background: #f44336; color: white; padding: 1rem; border-radius: 5px;">${data.message}</div>`;
+    // Validate passwords match
+    if (newPassword !== confirmPassword) {
+      messageDiv.innerHTML = '<div style="background: #f44336; color: white; padding: 1rem; border-radius: 5px;">New passwords do not match</div>';
+      return;
     }
-  } catch (error) {
-    console.error('Change password error:', error);
-    messageDiv.innerHTML = '<div style="background: #f44336; color: white; padding: 1rem; border-radius: 5px;">Failed to change password</div>';
-  }
-});
-
+    
+    try {
+      const response = await fetch(`${API_URL}/auth/change-password`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ currentPassword, newPassword })
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        messageDiv.innerHTML = '<div style="background: #4CAF50; color: white; padding: 1rem; border-radius: 5px;">Password changed successfully!</div>';
+        document.getElementById('changePasswordForm').reset();
+      } else {
+        messageDiv.innerHTML = `<div style="background: #f44336; color: white; padding: 1rem; border-radius: 5px;">${data.message}</div>`;
+      }
+    } catch (error) {
+      console.error('Change password error:', error);
+      messageDiv.innerHTML = '<div style="background: #f44336; color: white; padding: 1rem; border-radius: 5px;">Failed to change password</div>';
+    }
+  });
 </script>
 </body>
 </html>
