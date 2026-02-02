@@ -261,7 +261,7 @@
         <button class="btn btn-primary" id="uploadBtn" disabled>Upload Profile Picture</button>
         <button class="btn btn-secondary" id="cancelBtn">Cancel</button>
 
-        <a href="dashboard.html" class="back-link">← Back to Dashboard</a>
+        <a href="#" class="back-link" id="backLink">← Back to Dashboard</a>
     </div>
 
     <script>
@@ -277,13 +277,23 @@
         const message = document.getElementById('message');
         const loading = document.getElementById('loading');
         const profilePreview = document.getElementById('profilePreview');
+        const backLink = document.getElementById('backLink');
 
         let selectedFile = null;
 
-        // Check if user is logged in
+        // Check if user is logged in and set back link
         const token = localStorage.getItem('token');
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        
         if (!token) {
             window.location.href = 'login.html';
+        } else {
+            // Set correct back link based on user role
+            if (user.role === 'admin') {
+                backLink.href = 'admin-dashboard.html';
+            } else {
+                backLink.href = 'client-dashboard.html';
+            }
         }
 
         // Click to upload
@@ -387,9 +397,14 @@
                     // Update local storage with new user data
                     localStorage.setItem('user', JSON.stringify(data.data.user));
 
-                    // Redirect to dashboard after 2 seconds
+                    // Redirect based on user role after 2 seconds
                     setTimeout(() => {
-                        window.location.href = 'dashboard.html';
+                        const updatedUser = JSON.parse(localStorage.getItem('user') || '{}');
+                        if (updatedUser.role === 'admin') {
+                            window.location.href = 'admin-dashboard.html';
+                        } else {
+                            window.location.href = 'client-dashboard.html';
+                        }
                     }, 2000);
                 } else {
                     showMessage(data.message || 'Upload failed. Please try again.', 'error');
@@ -404,14 +419,13 @@
             }
         });
 
-        // Cancel button
+        // Cancel button - redirect to correct dashboard
         cancelBtn.addEventListener('click', () => {
-            selectedFile = null;
-            fileInput.value = '';
-            fileInfo.classList.remove('show');
-            profilePreview.innerHTML = '<span class="placeholder">👤</span>';
-            uploadBtn.disabled = true;
-            message.classList.remove('show');
+            if (user.role === 'admin') {
+                window.location.href = 'admin-dashboard.html';
+            } else {
+                window.location.href = 'client-dashboard.html';
+            }
         });
 
         // Helper function to format file size
@@ -431,9 +445,9 @@
 
         // Load current profile picture if exists
         window.addEventListener('DOMContentLoaded', () => {
-            const user = JSON.parse(localStorage.getItem('user') || '{}');
-            if (user.profilePicture) {
-                profilePreview.innerHTML = `<img src="${user.profilePicture}" alt="Current Profile">`;
+            const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+            if (currentUser.profilePicture) {
+                profilePreview.innerHTML = `<img src="${currentUser.profilePicture}" alt="Current Profile">`;
             }
         });
     </script>

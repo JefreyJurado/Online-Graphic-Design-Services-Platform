@@ -78,12 +78,56 @@
       padding: 1.5rem;
       border-radius: 12px;
       margin-bottom: 2rem;
-      text-align: center;
     }
     
     .admin-header h1 {
       color: #ff9800;
       margin-bottom: 0.5rem;
+    }
+
+    /* Profile Picture Styles */
+    .user-profile {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .profile-pic {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid #ff9800;
+    }
+
+    .profile-pic-placeholder {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: rgba(255, 152, 0, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+      border: 3px solid #ff9800;
+    }
+
+    .upload-profile-btn {
+      display: inline-block;
+      padding: 8px 16px;
+      background: #ff9800;
+      color: #000;
+      text-decoration: none;
+      border-radius: 5px;
+      font-size: 14px;
+      font-weight: 600;
+      transition: background 0.3s;
+    }
+
+    .upload-profile-btn:hover {
+      background: #50c2f7;
+      color: white;
     }
     
     .stats-grid {
@@ -319,7 +363,14 @@
 
 <main>
   <div class="admin-header">
-    <h1>Admin Dashboard</h1>
+    <!-- Profile Picture Section -->
+    <div class="user-profile">
+      <div id="profilePicContainer"></div>
+      <div>
+        <h1 id="adminWelcome">Admin Dashboard</h1>
+        <a href="upload-profile.html" class="upload-profile-btn">📸 Upload Profile Picture</a>
+      </div>
+    </div>
     <p>Manage quotations, services, and platform operations</p>
   </div>
 
@@ -499,6 +550,26 @@
   }
   
   document.getElementById('adminName').textContent = user.name || 'Admin';
+
+  // Display user profile picture
+  function displayUserProfile() {
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    const profilePicContainer = document.getElementById('profilePicContainer');
+    const adminWelcome = document.getElementById('adminWelcome');
+    
+    if (user.name) {
+      adminWelcome.textContent = `Welcome, ${user.name}!`;
+    }
+    
+    if (user.profilePicture) {
+      profilePicContainer.innerHTML = `<img src="${user.profilePicture}" alt="Profile" class="profile-pic">`;
+    } else {
+      profilePicContainer.innerHTML = `<div class="profile-pic-placeholder">👤</div>`;
+    }
+  }
+
+  // Call on page load
+  window.addEventListener('DOMContentLoaded', displayUserProfile);
   
   let allQuotations = [];
   let currentFilter = 'all';
