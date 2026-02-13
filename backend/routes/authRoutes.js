@@ -30,13 +30,14 @@ router.get(
   '/google/callback',
   passport.authenticate('google', { 
     session: false,
-    failureRedirect: '/login.html'
+    failureRedirect: 'https://jefrey-design.vercel.app/login.html'
   }),
   (req, res) => {
     try {
       console.log('🎯 Google callback hit!');
-      console.log('📍 NODE_ENV:', process.env.NODE_ENV);
-      console.log('📍 FRONTEND_URL from env:', process.env.FRONTEND_URL);
+      console.log('📍 Request host:', req.get('host'));
+      console.log('📍 Request protocol:', req.protocol);
+      console.log('📍 Referer:', req.get('referer'));
       
       const token = jwt.sign(
         { id: req.user._id, role: req.user.role },
@@ -55,26 +56,29 @@ router.get(
         dateRegistered: req.user.dateRegistered
       }));
 
-      // Auto-detect frontend URL based on environment
-      const frontendURL = process.env.FRONTEND_URL || 
-        (process.env.NODE_ENV === 'production' 
-          ? 'https://jefrey-design.vercel.app'
-          : 'http://127.0.0.1:5500');
+      // Detect frontend URL from request
+      let frontendURL;
+      const host = req.get('host');
+      
+      if (host && host.includes('vercel.app')) {
+        // Production - use production frontend
+        frontendURL = 'https://jefrey-design.vercel.app';
+      } else if (host && host.includes('localhost')) {
+        // Local development
+        frontendURL = 'http://127.0.0.1:5500';
+      } else {
+        // Fallback to production
+        frontendURL = 'https://jefrey-design.vercel.app';
+      }
 
-      console.log('🔀 Final frontendURL:', frontendURL);
-      console.log('🔀 Full redirect:', `${frontendURL}/google-auth-success.html?token=...&user=...`);
+      console.log('🔀 Detected frontendURL:', frontendURL);
+      console.log('🔀 Full redirect URL:', `${frontendURL}/google-auth-success.html`);
 
       res.redirect(`${frontendURL}/google-auth-success.html?token=${token}&user=${userData}`);
     } catch (error) {
       console.error('❌ Google callback error:', error);
-      console.error('❌ Error stack:', error.stack);
-      
-      const frontendURL = process.env.FRONTEND_URL || 
-        (process.env.NODE_ENV === 'production' 
-          ? 'https://jefrey-design.vercel.app'
-          : 'http://127.0.0.1:5500');
-        
-      res.redirect(`${frontendURL}/login.html?error=auth_failed`);
+      console.error('❌ Stack:', error.stack);
+      res.redirect('https://jefrey-design.vercel.app/login.html?error=auth_failed');
     }
   }
 );
