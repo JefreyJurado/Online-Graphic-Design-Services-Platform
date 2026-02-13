@@ -388,9 +388,10 @@
     }
   }
 
-  // Google OAuth Login
+// Google OAuth Login
 function loginWithGoogle() {
-  window.location.href = 'http://localhost:5000/api/auth/google';
+  const backendURL = API_URL.replace('/api', ''); // Remove /api suffix
+  window.location.href = `${backendURL}/api/auth/google`;
 }
 </script>
 </body>
