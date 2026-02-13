@@ -35,6 +35,8 @@ router.get(
   (req, res) => {
     try {
       console.log('🎯 Google callback hit!');
+      console.log('📍 NODE_ENV:', process.env.NODE_ENV);
+      console.log('📍 FRONTEND_URL from env:', process.env.FRONTEND_URL);
       
       const token = jwt.sign(
         { id: req.user._id, role: req.user.role },
@@ -59,11 +61,13 @@ router.get(
           ? 'https://jefrey-design.vercel.app'
           : 'http://127.0.0.1:5500');
 
-      console.log('🔀 Redirecting to:', `${frontendURL}/google-auth-success.html`);
+      console.log('🔀 Final frontendURL:', frontendURL);
+      console.log('🔀 Full redirect:', `${frontendURL}/google-auth-success.html?token=...&user=...`);
 
       res.redirect(`${frontendURL}/google-auth-success.html?token=${token}&user=${userData}`);
     } catch (error) {
       console.error('❌ Google callback error:', error);
+      console.error('❌ Error stack:', error.stack);
       
       const frontendURL = process.env.FRONTEND_URL || 
         (process.env.NODE_ENV === 'production' 
