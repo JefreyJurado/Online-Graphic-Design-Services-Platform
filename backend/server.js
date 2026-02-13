@@ -59,6 +59,19 @@ app.get('/', (req, res) => {
   });
 });
 
+app.get('/api/debug-env', (req, res) => {
+  res.json({
+    GOOGLE_CALLBACK_URL: process.env.GOOGLE_CALLBACK_URL,
+    FRONTEND_URL: process.env.FRONTEND_URL,
+    NODE_ENV: process.env.NODE_ENV,
+    hasGoogleClientID: !!process.env.GOOGLE_CLIENT_ID,
+    hasGoogleClientSecret: !!process.env.GOOGLE_CLIENT_SECRET,
+    allEnvKeys: Object.keys(process.env).filter(key => 
+      key.includes('GOOGLE') || key.includes('FRONTEND')
+    )
+  });
+});
+
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error('❌ Error:', err);
