@@ -1,7 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const { protect, adminOnly } = require('../middleware/authMiddleware');
-const { validateReferenceImages } = require('../validators/imageValidator'); // ← NEW
+const { validateReferenceImages } = require('../validators/imageValidator');
+const { quotationLimiter } = require('../middleware/rateLimiter'); 
+const { validateObjectId } = require('../middleware/validation');
 const {
   createQuotation,
   getMyQuotations,
@@ -9,11 +11,10 @@ const {
   getAllQuotations,
   updateQuotation,
   deleteQuotation,
-  addImagesToQuotation,      // ← NEW
-  removeImagesFromQuotation  // ← NEW
+  addImagesToQuotation,
+  removeImagesFromQuotation
 } = require('../controllers/quotationController');
 
-// Optional authentication middleware
 const optionalAuth = async (req, res, next) => {
   const token = req.headers.authorization?.split(' ')[1];
   
@@ -32,20 +33,20 @@ const optionalAuth = async (req, res, next) => {
   next();
 };
 
-// Public/Guest routes
-router.post('/', optionalAuth, validateReferenceImages, createQuotation); // ← UPDATED: Added validation
+// Public/Guest routes - ADD RATE LIMITER
+router.post('/', optionalAuth, quotationLimiter, validateReferenceImages, createQuotation); 
 
-// Protected client routes
+// Protected client routes - ADD VALIDATION
 router.get('/my-quotations', protect, getMyQuotations);
-router.get('/:id', protect, getQuotationById);
+router.get('/:id', protect, validateObjectId('id'), getQuotationById); 
 
-// ===== NEW: Image management routes =====
-router.patch('/:id/images/add', protect, validateReferenceImages, addImagesToQuotation);
-router.patch('/:id/images/remove', protect, removeImagesFromQuotation);
+// Image management routes - ADD VALIDATION
+router.patch('/:id/images/add', protect, validateObjectId('id'), validateReferenceImages, addImagesToQuotation); 
+router.patch('/:id/images/remove', protect, validateObjectId('id'), removeImagesFromQuotation); 
 
-// Admin routes (but PUT allows clients for revisions)
+// Admin routes - ADD VALIDATION
 router.get('/', protect, adminOnly, getAllQuotations);
-router.put('/:id', protect, updateQuotation);
-router.delete('/:id', protect, adminOnly, deleteQuotation);
+router.put('/:id', protect, validateObjectId('id'), updateQuotation); 
+router.delete('/:id', protect, adminOnly, validateObjectId('id'), deleteQuotation); 
 
 module.exports = router;

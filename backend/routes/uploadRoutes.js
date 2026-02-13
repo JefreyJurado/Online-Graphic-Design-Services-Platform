@@ -2,13 +2,14 @@ const express = require('express');
 const router = express.Router();
 const { uploadProfilePicture, uploadServiceImage } = require('../middleware/upload');
 const { protect } = require('../middleware/authMiddleware');
+const { uploadLimiter } = require('../middleware/rateLimiter');
 const User = require('../models/User');
 const Service = require('../models/Service');
 
 // @route   POST /api/upload/profile
 // @desc    Upload profile picture
 // @access  Private
-router.post('/profile', protect, uploadProfilePicture.single('profilePicture'), async (req, res) => {
+router.post('/profile', protect, uploadLimiter, uploadProfilePicture.single('profilePicture'), async (req, res) => { // ← ADD uploadLimiter
   console.log('🔵 UPLOAD ROUTE HIT!');
   console.log('📁 File:', req.file);
   console.log('👤 User:', req.user);
@@ -27,7 +28,7 @@ router.post('/profile', protect, uploadProfilePicture.single('profilePicture'), 
     // Update user's profile picture in database
     const user = await User.findByIdAndUpdate(
       req.user._id,
-      { profilePicture: req.file.location }, // S3 URL
+      { profilePicture: req.file.location },
       { new: true, runValidators: true }
     ).select('-password');
 
@@ -55,7 +56,7 @@ router.post('/profile', protect, uploadProfilePicture.single('profilePicture'), 
 // @route   POST /api/upload/service/:serviceId
 // @desc    Upload service image
 // @access  Private (Admin only)
-router.post('/service/:serviceId', protect, uploadServiceImage.single('serviceImage'), async (req, res) => {
+router.post('/service/:serviceId', protect, uploadLimiter, uploadServiceImage.single('serviceImage'), async (req, res) => { // ← ADD uploadLimiter
   try {
     // Check if user is admin
     if (req.user.role !== 'admin') {
@@ -77,7 +78,7 @@ router.post('/service/:serviceId', protect, uploadServiceImage.single('serviceIm
     // Add image URL to service's images array
     const service = await Service.findByIdAndUpdate(
       serviceId,
-      { $push: { images: req.file.location } }, // Add to images array
+      { $push: { images: req.file.location } },
       { new: true }
     );
 

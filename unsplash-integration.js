@@ -1,6 +1,9 @@
 // Unsplash Image Search Integration
 // API Configuration
-const API_BASE_URL = 'https://online-graphic-design-services-plat.vercel.app'// Change to your production URL later
+// API Configuration - Auto-detect local vs production
+const API_BASE_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+  ? 'http://localhost:5000'
+  : 'https://online-graphic-design-services-plat.vercel.app';
 
 // State management
 let searchTimeout = null;

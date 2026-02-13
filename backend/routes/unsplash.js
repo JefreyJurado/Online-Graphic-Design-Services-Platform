@@ -6,7 +6,6 @@ const unsplashService = require('../services/unsplashService');
 const { validateSearchQuery } = require('../validators/unsplashValidator');
 
 // Rate limiter: 100 requests per 15 minutes per IP
-// This protects your app from abuse and helps stay within Unsplash's 50 req/hour limit
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // Limit each IP to 100 requests per windowMs
@@ -18,12 +17,6 @@ const limiter = rateLimit({
   legacyHeaders: false // Disable `X-RateLimit-*` headers
 });
 
-/**
- * @route   GET /api/unsplash/search
- * @desc    Search for photos on Unsplash
- * @access  Public
- * @params  query (required), page (optional), per_page (optional)
- */
 router.get('/search', limiter, validateSearchQuery, async (req, res) => {
   try {
     const { query, page = 1, per_page = 10 } = req.query;
@@ -62,12 +55,6 @@ router.get('/search', limiter, validateSearchQuery, async (req, res) => {
   }
 });
 
-/**
- * @route   GET /api/unsplash/random
- * @desc    Get random photos from Unsplash
- * @access  Public
- * @params  count (optional), query (optional)
- */
 router.get('/random', limiter, async (req, res) => {
   try {
     const { count = 5, query } = req.query;
