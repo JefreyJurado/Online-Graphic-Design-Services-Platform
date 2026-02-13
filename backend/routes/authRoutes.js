@@ -4,9 +4,64 @@ const bcrypt = require('bcryptjs');
 const User = require('../models/User');
 const authController = require('../controllers/authController');
 const { protect } = require('../middleware/authMiddleware');
+const passport = require('../config/passport');
+const jwt = require('jsonwebtoken');
 
 router.post('/register', authController.register);
 router.post('/login', authController.login);
+
+// Google OAuth Routes - ADD THE FIRST ROUTE HERE!
+router.get(
+  '/google',
+  passport.authenticate('google', { 
+    scope: ['profile', 'email'],
+    session: false 
+  })
+);
+
+router.get(
+  '/google/callback',
+  passport.authenticate('google', { 
+    session: false,
+    failureRedirect: '/login.html'
+  }),
+  (req, res) => {
+    try {
+      console.log('🎯 Google callback hit!');
+      console.log('👤 User from Google:', req.user);
+      
+      // Generate JWT token
+      const token = jwt.sign(
+        { id: req.user._id, role: req.user.role },
+        process.env.JWT_SECRET,
+        { expiresIn: '7d' }
+      );
+
+      console.log('🔑 Token generated:', token);
+
+      // Redirect to frontend with token and user data
+      const userData = encodeURIComponent(JSON.stringify({
+        _id: req.user._id,
+        name: req.user.name,
+        email: req.user.email,
+        role: req.user.role,
+        phone: req.user.phone,
+        address: req.user.address,
+        profilePicture: req.user.profilePicture,
+        dateRegistered: req.user.dateRegistered
+      }));
+
+      console.log('📦 User data prepared');
+      console.log('🔀 Redirecting to:', `http://127.0.0.1:5500/google-auth-success.html?token=${token.substring(0, 20)}...`);
+
+      res.redirect(`http://127.0.0.1:5500/google-auth-success.html?token=${token}&user=${userData}`);
+    } catch (error) {
+      console.error('❌ Google callback error:', error);
+      console.error('Error stack:', error.stack);
+      res.redirect('http://127.0.0.1:5500/login.html?error=auth_failed');
+    }
+  }
+);
 
 // Change Password Route
 router.put('/change-password', protect, async (req, res) => {

@@ -4,43 +4,65 @@ const bcrypt = require('bcryptjs');
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: [true, 'Please provide your name']
+    required: [true, 'Name is required'],
+    trim: true
   },
   email: {
     type: String,
-    required: [true, 'Please provide your email'],
+    required: [true, 'Email is required'],
     unique: true,
-    lowercase: true
+    lowercase: true,
+    trim: true
   },
   password: {
     type: String,
-    required: [true, 'Please provide a password'],
-    minlength: 6
+    required: function() {
+      // Password not required if user signed up with Google
+      return !this.googleId;
+    },
+    minlength: 6,
+    select: false
+  },
+  googleId: {
+    type: String,
+    unique: true,
+    sparse: true
   },
   role: {
     type: String,
     enum: ['client', 'admin'],
     default: 'client'
   },
-  profilePicture: { 
+  phone: {
+    type: String,
+    default: ''
+  },
+  address: {
+    type: String,
+    default: ''
+  },
+  profilePicture: {
     type: String,
     default: null
   },
-  phone: String,
-  address: String,
   dateRegistered: {
     type: Date,
     default: Date.now
   }
 });
 
-// Hash password before saving
+// Hash password before saving - FIXED VERSION
 userSchema.pre('save', async function() {
   if (!this.isModified('password')) return;
-  this.password = await bcrypt.hash(this.password, 10);
+  
+  // Only hash if password exists (skip for Google OAuth users)
+  if (this.password) {
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+  }
 });
 
-// Compare passwords
+// Compare password method
 userSchema.methods.comparePassword = async function(candidatePassword) {
   return await bcrypt.compare(candidatePassword, this.password);
 };

@@ -1,14 +1,20 @@
+// Load environment variables - ALWAYS
+require('dotenv').config();
+
 const express = require('express');
 const cors = require('cors');
 const connectDB = require('./config/database');
-if (process.env.NODE_ENV !== 'production') {
-  require('dotenv').config();
-}
+const passport = require('./config/passport');
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Initialize Passport
+app.use(passport.initialize());
+
 app.use((req, res, next) => {
   console.log(`\n🌐 ${req.method} ${req.url}`);
   console.log('📋 Headers:', req.headers);
@@ -34,6 +40,8 @@ app.get('/', (req, res) => {
     endpoints: {
       register: 'POST /api/auth/register',
       login: 'POST /api/auth/login',
+      googleAuth: 'GET /api/auth/google', // ← ADD THIS
+      googleCallback: 'GET /api/auth/google/callback', // ← ADD THIS
       services: 'GET /api/services',
       quotations: 'GET /api/quotations',
       unsplashSearch: 'GET /api/unsplash/search?query=logo',
@@ -49,4 +57,5 @@ app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
   console.log(`✓ Unsplash API routes mounted at /api/unsplash`);
   console.log(`✓ Upload routes mounted at /api/upload`);
+  console.log(`✓ Google OAuth routes mounted at /api/auth/google`); // ← ADD THIS
 });
