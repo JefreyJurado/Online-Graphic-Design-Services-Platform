@@ -101,7 +101,7 @@ exports.login = async (req, res) => {
         role: user.role,
         phone: user.phone,
         address: user.address,
-        profilePicture: user.profilePicture,  // ← THIS IS THE KEY FIX!
+        profilePicture: user.profilePicture, // ← Include profile picture in login response
         dateRegistered: user.dateRegistered
       }
     });

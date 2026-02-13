@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { protect, adminOnly } = require('../middleware/authMiddleware');
-// const { validateObjectId } = require('../middleware/validation'); // ← COMMENT OUT
+
 const {
   getAllServices,
   getServiceById,
@@ -12,11 +12,11 @@ const {
 
 // Public routes
 router.get('/', getAllServices);
-router.get('/:id', getServiceById); // ← REMOVE validateObjectId('id')
+router.get('/:id', getServiceById); 
 
 // Protected admin routes
-router.post('/', protect, adminOnly, createService); // ← NO VALIDATION
-router.put('/:id', protect, adminOnly, updateService); // ← REMOVE validateObjectId('id')
-router.delete('/:id', protect, adminOnly, deleteService); // ← REMOVE validateObjectId('id')
+router.post('/', protect, adminOnly, createService); 
+router.put('/:id', protect, adminOnly, updateService); 
+router.delete('/:id', protect, adminOnly, deleteService); 
 
 module.exports = router;

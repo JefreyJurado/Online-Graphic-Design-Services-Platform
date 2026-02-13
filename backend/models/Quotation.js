@@ -62,7 +62,7 @@ const quotationSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
-  // ===== NEW: Reference Images from Unsplash API =====
+  // Reference Images from Unsplash API (Clients can add when requesting revisions, Admins can add anytime)
   referenceImages: [{
     unsplashId: {
       type: String,
@@ -113,7 +113,7 @@ const quotationSchema = new mongoose.Schema({
       default: Date.now
     }
   }],
-  // ===== End of new field =====
+  // End of new field
   dateRequested: {
     type: Date,
     default: Date.now
@@ -125,7 +125,7 @@ const quotationSchema = new mongoose.Schema({
   timestamps: true  // Adds createdAt and updatedAt automatically
 });
 
-// ===== NEW: Validation hook for max 5 images =====
+// Validation hook for max 5 images
 quotationSchema.pre('save', async function() {
   if (this.referenceImages && this.referenceImages.length > 5) {
     throw new Error('Maximum 5 reference images allowed per quotation');

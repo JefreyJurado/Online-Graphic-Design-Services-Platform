@@ -3,10 +3,6 @@ require('dotenv').config();
 
 const express = require('express');
 const cors = require('cors');
-// REMOVE THESE IMPORTS:
-// const mongoSanitize = require('express-mongo-sanitize');
-// const xss = require('xss-clean');
-// const hpp = require('hpp');
 
 const connectDB = require('./config/database');
 const passport = require('./config/passport');
@@ -17,11 +13,6 @@ const app = express();
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
-
-// REMOVE THESE LINES:
-// app.use(mongoSanitize());
-// app.use(xss());
-// app.use(hpp());
 
 // Initialize Passport
 app.use(passport.initialize());

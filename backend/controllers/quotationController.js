@@ -15,7 +15,7 @@ exports.createQuotation = async (req, res) => {
       guestName, 
       guestEmail, 
       guestPhone,
-      referenceImages  // ← NEW: Accept reference images
+      referenceImages  // Accept reference images
     } = req.body;
     
     // Validation
@@ -84,7 +84,7 @@ exports.createQuotation = async (req, res) => {
   } catch (error) {
     console.error('Create quotation error:', error);
     
-    // ← NEW: Handle max images error
+    // Handle max images error
     if (error.message && error.message.includes('Maximum 5 reference images')) {
       return res.status(400).json({
         success: false,
@@ -254,7 +254,7 @@ exports.updateQuotation = async (req, res) => {
   }
 };
 
-// ===== NEW: Add images to quotation =====
+// Add images to quotation (Clients can add images when requesting revisions, Admins can add anytime)
 exports.addImagesToQuotation = async (req, res) => {
   try {
     const { id } = req.params;
@@ -329,7 +329,7 @@ exports.addImagesToQuotation = async (req, res) => {
   }
 };
 
-// ===== NEW: Remove images from quotation =====
+// Remove images from quotation (Clients can remove images when requesting revisions, Admins can remove anytime)
 exports.removeImagesFromQuotation = async (req, res) => {
   try {
     const { id } = req.params;

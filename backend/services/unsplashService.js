@@ -12,13 +12,6 @@ class UnsplashService {
     }
   }
 
-  /**
-   * Search for photos on Unsplash
-   * @param {string} query - Search query
-   * @param {number} page - Page number (default: 1)
-   * @param {number} perPage - Results per page (default: 10)
-   * @returns {Promise<Object>} Search results with total, total_pages, and results array
-   */
   async searchPhotos(query, page = 1, perPage = 10) {
     const cacheKey = `search:${query}:${page}:${perPage}`;
     
@@ -73,12 +66,6 @@ class UnsplashService {
     }
   }
 
-  /**
-   * Get random photos from Unsplash
-   * @param {number} count - Number of photos (default: 5, max: 30)
-   * @param {string} query - Optional query to filter random photos
-   * @returns {Promise<Object>} Random photos
-   */
   async getRandomPhotos(count = 5, query = null) {
     try {
       console.log(`📡 Fetching ${count} random photos${query ? ` for "${query}"` : ''}`);
@@ -104,11 +91,6 @@ class UnsplashService {
     }
   }
 
-  /**
-   * Format photo data to match our schema
-   * @param {Object} photo - Raw photo data from Unsplash
-   * @returns {Object} Formatted photo object
-   */
   formatPhoto(photo) {
     return {
       unsplashId: photo.id,
@@ -124,23 +106,6 @@ class UnsplashService {
     };
   }
 
-  /**
-   * Store data in cache with timestamp
-   * @param {string} key - Cache key
-   * @param {Object} data - Data to cache
-   */
-  setCache(key, data) {
-    cache.set(key, {
-      data,
-      timestamp: Date.now()
-    });
-  }
-
-  /**
-   * Get data from cache if not expired
-   * @param {string} key - Cache key
-   * @returns {Object|null} Cached data or null if expired/not found
-   */
   getFromCache(key) {
     const cached = cache.get(key);
     if (!cached) return null;
@@ -154,10 +119,6 @@ class UnsplashService {
     return cached.data;
   }
 
-  /**
-   * Get any cached search result (fallback for rate limit)
-   * @returns {Object|null} Any cached search result
-   */
   getAnyCachedSearch() {
     for (let [key, value] of cache.entries()) {
       if (key.startsWith('search:') && Date.now() - value.timestamp <= CACHE_TTL) {
@@ -168,11 +129,6 @@ class UnsplashService {
     return null;
   }
 
-  /**
-   * Handle API errors and format them
-   * @param {Error} error - Error from axios
-   * @returns {Object} Formatted error
-   */
   handleError(error) {
     if (error.response) {
       // API responded with error

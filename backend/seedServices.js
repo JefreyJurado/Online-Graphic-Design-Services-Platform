@@ -29,7 +29,7 @@ const sampleServices = [
       "Brand style guide included",
       "Commercial usage rights"
     ],
-    createdBy: null, // We'll set this to a valid user ID
+    createdBy: null,
     isActive: true
   },
   {
@@ -175,7 +175,7 @@ const sampleServices = [
 // Seed function
 async function seedServices() {
   try {
-    // First, we need to get a user ID (the one we created - jeffrey@test.com)
+    
     const User = require('./models/User');
     const user = await User.findOne({ email: 'jeffrey@test.com' });
     
