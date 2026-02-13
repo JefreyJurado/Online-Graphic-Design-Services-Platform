@@ -53,10 +53,24 @@ router.get(
         dateRegistered: req.user.dateRegistered
       }));
 
-      res.redirect(`http://127.0.0.1:5500/google-auth-success.html?token=${token}&user=${userData}`);
+      // Auto-detect frontend URL based on environment
+      const frontendURL = process.env.FRONTEND_URL || 
+        (process.env.NODE_ENV === 'production' 
+          ? 'https://jefrey-design.vercel.app'
+          : 'http://127.0.0.1:5500');
+
+      console.log('🔀 Redirecting to:', `${frontendURL}/google-auth-success.html`);
+
+      res.redirect(`${frontendURL}/google-auth-success.html?token=${token}&user=${userData}`);
     } catch (error) {
       console.error('❌ Google callback error:', error);
-      res.redirect('http://127.0.0.1:5500/login.html?error=auth_failed');
+      
+      const frontendURL = process.env.FRONTEND_URL || 
+        (process.env.NODE_ENV === 'production' 
+          ? 'https://jefrey-design.vercel.app'
+          : 'http://127.0.0.1:5500');
+        
+      res.redirect(`${frontendURL}/login.html?error=auth_failed`);
     }
   }
 );
