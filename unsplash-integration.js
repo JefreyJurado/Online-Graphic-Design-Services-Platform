@@ -33,14 +33,14 @@ function addImageSearchToForm() {
   const form = document.getElementById('quoteForm');
   if (!form) return;
   
-  // Find the submit button
-  const submitButton = form.querySelector('button[type="submit"]');
-  if (!submitButton) return;
+// Find the submit button
+const submitButton = form.querySelector('button[type="submit"]');
+if (!submitButton) return;
   
-  // Create image search section
-  const imageSection = document.createElement('div');
-  imageSection.className = 'image-search-section';
-  imageSection.innerHTML = `
+// Create image search section
+const imageSection = document.createElement('div');
+imageSection.className = 'image-search-section';
+imageSection.innerHTML = `
 <h3 style="color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">Add Reference Images (Optional)</h3>
 <p style="color: #ddd; margin-bottom: 1rem; text-shadow: 0 1px 2px rgba(0,0,0,0.5);">
   Search for design inspiration from Unsplash (max 5 images)
@@ -222,7 +222,7 @@ function toggleImageSelection(image) {
       alert(`Maximum ${MAX_IMAGES} images allowed per quotation`);
       return;
     }
-        // Truncate description before adding
+    // Truncate description before adding
     const imageToAdd = {
     ...image,
     description: truncateDescription(image.description)

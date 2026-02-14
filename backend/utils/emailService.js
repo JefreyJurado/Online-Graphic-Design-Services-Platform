@@ -80,9 +80,9 @@ exports.sendQuoteResponseEmail = async (quote) => {
                 <strong>Want to track your quote in real-time?</strong><br>
                 Create a free account to view updates and manage your projects!
               </p>
-              <a href="http://localhost:5500/register.html" class="button">Create Account</a>
+              <a href="https://jefrey-design.vercel.app/register.html" class="button">Create Account</a>
             ` : `
-              <a href="http://localhost:5500/client-dashboard.html" class="button">View Dashboard</a>
+              <a href="https://jefrey-design.vercel.app/client-dashboard.html" class="button">View Dashboard</a>
             `}
             
             <div class="footer">

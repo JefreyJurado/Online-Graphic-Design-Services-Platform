@@ -67,7 +67,7 @@ exports.createQuotation = async (req, res) => {
       deadline,
       additionalInfo: additionalInfo || '',
       guestInfo: clientId ? undefined : guestInfo,
-      referenceImages: referenceImages || []  // ← NEW: Include reference images
+      referenceImages: referenceImages || []  // Include reference images
     });
     
     // Populate service info

@@ -353,7 +353,7 @@ const API_URL = (window.location.hostname === 'localhost' || window.location.hos
   ? 'http://localhost:5000/api'
   : 'https://online-graphic-design-services-plat.vercel.app/api';
   
-  // Check if user is logged in (OPTIONAL - not required)
+  // Check if user is logged in and update UI accordingly
   const token = localStorage.getItem('token');
   const user = JSON.parse(localStorage.getItem('user') || '{}');
   
@@ -459,7 +459,7 @@ const API_URL = (window.location.hostname === 'localhost' || window.location.hos
     budget: document.getElementById('budget').value,
     deadline: document.getElementById('deadline').value,
     additionalInfo: document.getElementById('additionalInfo').value.trim(),
-    referenceImages: window.getSelectedImages ? window.getSelectedImages() : []  // ← ADD THIS LINE
+    referenceImages: window.getSelectedImages ? window.getSelectedImages() : [] 
   };
     
     // Add guest contact info if not logged in
