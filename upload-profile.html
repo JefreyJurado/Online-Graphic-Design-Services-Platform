@@ -265,7 +265,9 @@
     </div>
 
     <script>
-        const API_URL = 'https://online-graphic-design-services-plat.vercel.app/api';
+        const API_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+        ? 'http://localhost:5000/api'
+        : 'https://online-graphic-design-services-plat.vercel.app/api';
 
         const uploadArea = document.getElementById('uploadArea');
         const fileInput = document.getElementById('fileInput');
@@ -329,7 +331,7 @@
         });
 
         // Handle file selection
-        function handleFile(file) {
+        async function handleFile(file) {
             // Validate file type
             const validTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif'];
             if (!validTypes.includes(file.type)) {
@@ -337,10 +339,16 @@
                 return;
             }
 
-            // Validate file size (2MB)
+            // Compress image if too large
             if (file.size > 2 * 1024 * 1024) {
-                showMessage('File too large. Maximum size is 2MB.', 'error');
-                return;
+                showMessage('Compressing image...', 'success');
+                try {
+                    file = await compressImage(file);
+                    showMessage('Image compressed! Ready to upload.', 'success');
+                } catch (error) {
+                    showMessage('File too large and compression failed. Please choose a smaller image.', 'error');
+                    return;
+                }
             }
 
             selectedFile = file;
@@ -361,7 +369,61 @@
             reader.readAsDataURL(file);
 
             // Hide any previous messages
-            message.classList.remove('show');
+            setTimeout(() => {
+                message.classList.remove('show');
+            }, 2000);
+        }
+
+        // Compress image function
+        function compressImage(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = (event) => {
+                    const img = new Image();
+                    img.src = event.target.result;
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        let width = img.width;
+                        let height = img.height;
+
+                        // Max dimensions
+                        const MAX_WIDTH = 800;
+                        const MAX_HEIGHT = 800;
+
+                        if (width > height) {
+                            if (width > MAX_WIDTH) {
+                                height *= MAX_WIDTH / width;
+                                width = MAX_WIDTH;
+                            }
+                        } else {
+                            if (height > MAX_HEIGHT) {
+                                width *= MAX_HEIGHT / height;
+                                height = MAX_HEIGHT;
+                            }
+                        }
+
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+
+                        canvas.toBlob((blob) => {
+                            if (blob) {
+                                const compressedFile = new File([blob], file.name, {
+                                    type: 'image/jpeg',
+                                    lastModified: Date.now()
+                                });
+                                resolve(compressedFile);
+                            } else {
+                                reject(new Error('Compression failed'));
+                            }
+                        }, 'image/jpeg', 0.8); // 80% quality
+                    };
+                    img.onerror = reject;
+                };
+                reader.onerror = reject;
+            });
         }
 
         // Upload button click
