@@ -268,7 +268,6 @@
         const API_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
         ? 'http://localhost:5000/api'
         : 'https://online-graphic-design-services-plat.vercel.app/api';
-        alert('API URL: ' + API_URL);
 
         const uploadArea = document.getElementById('uploadArea');
         const fileInput = document.getElementById('fileInput');
@@ -431,52 +430,87 @@
         uploadBtn.addEventListener('click', async () => {
             if (!selectedFile) return;
 
-            const formData = new FormData();
-            formData.append('profilePicture', selectedFile);
-
             try {
                 // Show loading
                 loading.classList.add('show');
                 uploadBtn.disabled = true;
                 cancelBtn.disabled = true;
 
-                const response = await fetch(`${API_URL}/upload/profile`, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: formData
+                // Use XMLHttpRequest for better mobile compatibility
+                const xhr = new XMLHttpRequest();
+                
+                xhr.upload.addEventListener('progress', (e) => {
+                    if (e.lengthComputable) {
+                        const percentComplete = (e.loaded / e.total) * 100;
+                        console.log('Upload progress:', percentComplete.toFixed(2) + '%');
+                    }
                 });
 
-                const data = await response.json();
+                xhr.addEventListener('load', () => {
+                    loading.classList.remove('show');
+                    cancelBtn.disabled = false;
 
-                // Hide loading
-                loading.classList.remove('show');
-                cancelBtn.disabled = false;
+                    if (xhr.status === 200) {
+                        try {
+                            const data = JSON.parse(xhr.responseText);
+                            
+                            if (data.success) {
+                                showMessage('Profile picture uploaded successfully! ✅', 'success');
+                                
+                                // Update local storage with new user data
+                                localStorage.setItem('user', JSON.stringify(data.data.user));
 
-                if (response.ok && data.success) {
-                    showMessage('Profile picture uploaded successfully! ✅', 'success');
-                    
-                    // Update local storage with new user data
-                    localStorage.setItem('user', JSON.stringify(data.data.user));
-
-                    // Redirect based on user role after 2 seconds
-                    setTimeout(() => {
-                        const updatedUser = JSON.parse(localStorage.getItem('user') || '{}');
-                        if (updatedUser.role === 'admin') {
-                            window.location.href = 'admin-dashboard.html';
-                        } else {
-                            window.location.href = 'client-dashboard.html';
+                                // Redirect based on user role after 2 seconds
+                                setTimeout(() => {
+                                    const updatedUser = JSON.parse(localStorage.getItem('user') || '{}');
+                                    if (updatedUser.role === 'admin') {
+                                        window.location.href = 'admin-dashboard.html';
+                                    } else {
+                                        window.location.href = 'client-dashboard.html';
+                                    }
+                                }, 2000);
+                            } else {
+                                showMessage(data.message || 'Upload failed. Please try again.', 'error');
+                                uploadBtn.disabled = false;
+                            }
+                        } catch (e) {
+                            showMessage('Invalid response from server', 'error');
+                            uploadBtn.disabled = false;
                         }
-                    }, 2000);
-                } else {
-                    showMessage(data.message || 'Upload failed. Please try again.', 'error');
+                    } else {
+                        showMessage('Upload failed with status: ' + xhr.status, 'error');
+                        uploadBtn.disabled = false;
+                    }
+                });
+
+                xhr.addEventListener('error', () => {
+                    console.error('XHR error');
+                    loading.classList.remove('show');
+                    showMessage('Network error. Please check your connection.', 'error');
                     uploadBtn.disabled = false;
-                }
+                    cancelBtn.disabled = false;
+                });
+
+                xhr.addEventListener('abort', () => {
+                    loading.classList.remove('show');
+                    showMessage('Upload cancelled', 'error');
+                    uploadBtn.disabled = false;
+                    cancelBtn.disabled = false;
+                });
+
+                // Create FormData
+                const formData = new FormData();
+                formData.append('profilePicture', selectedFile);
+
+                // Open and send request
+                xhr.open('POST', `${API_URL}/upload/profile`);
+                xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+                xhr.send(formData);
+
             } catch (error) {
                 console.error('Upload error:', error);
                 loading.classList.remove('show');
-                showMessage('Network error. Please check your connection.', 'error');
+                showMessage('Error: ' + error.message, 'error');
                 uploadBtn.disabled = false;
                 cancelBtn.disabled = false;
             }
