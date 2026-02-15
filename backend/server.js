@@ -30,7 +30,7 @@ connectDB();
 const { apiLimiter } = require('./middleware/rateLimiter');
 
 // Apply general rate limiter to all API routes
-app.use('/api/', apiLimiter);
+// app.use('/api/', apiLimiter); // ← COMMENTED OUT FOR TESTING, RE-ENABLE IN PRODUCTION
 
 // Routes
 app.use('/api/auth', require('./routes/authRoutes'));
