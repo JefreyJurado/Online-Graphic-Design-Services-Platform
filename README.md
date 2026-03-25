@@ -1,17 +1,105 @@
-Jefrey Jurado Graphic Design Portfolio
+# Online Graphic Design Services Platform
 
-This is my personal portfolio website that showcases my work as a graphic designer and developer. It is designed to be simple, professional, and easy to navigate.
+A full-stack web application where clients can request graphic design quotations, attach reference images, and track their project status.
 
-Sections
+**Live Site:** https://jefrey-design.vercel.app
 
-1. Home - The homepage introduces who I am and what I do. It has a short tagline and two call to action buttons: View My Work and Contact Me.
+---
 
-2. About Me - This section shares more about my background, skills, and passion for design and development. It also includes a button to view and download my resume.
+## About This Project
 
-3. Featured Projects - Here I highlight selected design and development projects. Projects are displayed in a grid for better organization and easy browsing.
+This platform allows users to:
+- Browse available graphic design services
+- Submit quotation requests (with or without registration)
+- Search and attach design reference images from Unsplash
+- Track quotation status and receive email notifications
+- Upload profile pictures and manage account settings
 
-4. Skills and Testimonials - This section lists the tools and technologies I use. Testimonials from clients and collaborators are also featured to build credibility and trust.
+Administrators can:
+- View all quotation requests
+- Update quotation status and set pricing
+- Add notes for clients
+- Approve or reject revision requests
 
-5. Contact - The final section encourages collaboration by providing ways to connect through email and social platforms.
-   
-Purpose: The goal of this portfolio is to present my work and skills in a clean and professional way while making it easy for visitors to connect with me.
+Built as a terminal assessment for **MO-IT149 Web Technology Application** course.
+
+---
+
+## Key Features
+
+- **Google OAuth Login** - Sign in with Google account
+- **Guest Submissions** - Request quotes without registration
+- **Reference Images** - Search Unsplash and attach up to 5 images per quote
+- **File Upload** - Profile pictures stored on AWS S3
+- **Email Notifications** - Automatic updates via Gmail
+- **Mobile Responsive** - Works on all devices
+- **Secure Authentication** - JWT tokens with bcrypt password hashing
+- **Role-Based Access** - Separate admin and client permissions
+
+---
+
+## Built With
+
+**Frontend:**
+- HTML, CSS, JavaScript
+- Bootstrap 5
+
+**Backend:**
+- Node.js & Express.js
+- MongoDB Atlas
+- Mongoose
+
+**External Services:**
+- AWS S3 (file storage)
+- Google OAuth 2.0 (authentication)
+- Unsplash API (reference images)
+- Gmail SMTP (email notifications)
+
+**Deployed on:** Vercel
+
+---
+
+## Live Deployment
+
+- **Frontend:** https://jefrey-design.vercel.app
+- **Backend API:** https://online-graphic-design-services-plat.vercel.app
+
+---
+
+## Security Features
+
+- JWT authentication with 7-day expiration
+- bcrypt password hashing
+- Input validation on all forms
+- Rate limiting to prevent abuse
+- Role-based access control (admin/client)
+- Secure file upload with type and size validation
+
+---
+
+## Testing
+
+- 24 test cases covering all features
+- 100% pass rate
+- Mobile compatibility tested on iOS and Android
+- All critical bugs fixed before deployment
+
+---
+
+## Author
+
+**Jefrey T. Jurado**
+
+- Course: MO-IT149 Web Technology Application
+- Institution: Mapua-Malayan Digital College
+- GitHub: [@JefreyJurado](https://github.com/JefreyJurado)
+
+---
+
+## License
+
+This project is created for educational purposes as part of the MO-IT149 course.
+
+---
+
+**Note:** This is an academic project demonstrating full-stack development with cloud services integration (AWS S3, Google OAuth, MongoDB Atlas, Unsplash API).
