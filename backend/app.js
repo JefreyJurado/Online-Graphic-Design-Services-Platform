@@ -11,6 +11,12 @@ const sanitizeMongoInput = require('./middleware/sanitize');
 
 const app = express();
 
+// Vercel puts exactly one reverse proxy hop in front of this app, which sets
+// X-Forwarded-For to the real client IP. Without this, Express ignores that
+// header and express-rate-limit falls back to the proxy's own IP for every
+// request, effectively rate-limiting all visitors as a single shared client.
+app.set('trust proxy', 1);
+
 // Security Middleware
 app.use(cors({
   origin: [
