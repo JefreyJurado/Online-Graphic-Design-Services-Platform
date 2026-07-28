@@ -631,6 +631,18 @@
     }
   }
   
+  // Escape untrusted text before inserting into innerHTML (prevents stored XSS
+  // from quotation fields, which originate from unauthenticated guest submissions)
+  function escapeHtml(value) {
+    if (value === null || value === undefined) return '';
+    return String(value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
   // Display quotations (UPDATED TO HANDLE GUEST QUOTES)
   function displayQuotations(quotations) {
     const container = document.getElementById('quotesContainer');
@@ -666,34 +678,34 @@
       <div class="quote-card">
         <div class="quote-header">
           <div>
-            <div class="quote-title">${quote.projectName}</div>
+            <div class="quote-title">${escapeHtml(quote.projectName)}</div>
             <p style="color: #ddd; margin: 0; font-size: 0.9rem;">
-              Client: <strong>${quote.client ? quote.client.name : (quote.guestInfo ? quote.guestInfo.name : 'Unknown')}</strong> 
-              (${quote.client ? quote.client.email : (quote.guestInfo ? quote.guestInfo.email : 'No email')})
+              Client: <strong>${escapeHtml(quote.client ? quote.client.name : (quote.guestInfo ? quote.guestInfo.name : 'Unknown'))}</strong>
+              (${escapeHtml(quote.client ? quote.client.email : (quote.guestInfo ? quote.guestInfo.email : 'No email'))})
               ${!quote.client ? '<span style="background: #ff9800; color: #000; padding: 0.2rem 0.5rem; border-radius: 10px; font-size: 0.75rem; margin-left: 0.5rem; font-weight: 600;">GUEST</span>' : ''}
             </p>
-            ${quote.guestInfo && quote.guestInfo.phone ? `<p style="color: #ddd; margin: 0; font-size: 0.9rem;"><strong>Phone:</strong> ${quote.guestInfo.phone}</p>` : ''}
+            ${quote.guestInfo && quote.guestInfo.phone ? `<p style="color: #ddd; margin: 0; font-size: 0.9rem;"><strong>Phone:</strong> ${escapeHtml(quote.guestInfo.phone)}</p>` : ''}
             <p style="color: #ddd; margin: 0; font-size: 0.9rem;">
-              Service: <strong>${quote.service ? quote.service.name : 'Service not found'}</strong>
+              Service: <strong>${escapeHtml(quote.service ? quote.service.name : 'Service not found')}</strong>
             </p>
           </div>
           <div class="status-badge" style="background: ${statusColors[quote.status]}; color: white;">
             ${statusEmojis[quote.status]} ${quote.status.toUpperCase()}
           </div>
         </div>
-        
+
         <div class="quote-details">
-          <p><strong>Budget:</strong> ${quote.budget}</p>
+          <p><strong>Budget:</strong> ${escapeHtml(quote.budget)}</p>
           <p><strong>Deadline:</strong> ${new Date(quote.deadline).toLocaleDateString()}</p>
           <p><strong>Requested:</strong> ${new Date(quote.dateRequested).toLocaleDateString()}</p>
           ${quote.quotedPrice > 0 ? `<p><strong>Quoted Price:</strong> ₱${quote.quotedPrice.toLocaleString()}</p>` : ''}
-        <p><strong>Description:</strong> ${quote.description || 'No description'}</p>
-        ${quote.adminNotes ? `<p><strong>Your Notes:</strong> ${quote.adminNotes}</p>` : ''}
-        ${quote.revisionRequest ? `<p style="background: rgba(255, 87, 34, 0.2); padding: 0.8rem; border-radius: 5px; border-left: 4px solid #FF5722;"><strong>🔄 Revision Request:</strong> ${quote.revisionRequest}</p>` : ''}
+        <p><strong>Description:</strong> ${escapeHtml(quote.description) || 'No description'}</p>
+        ${quote.adminNotes ? `<p><strong>Your Notes:</strong> ${escapeHtml(quote.adminNotes)}</p>` : ''}
+        ${quote.revisionRequest ? `<p style="background: rgba(255, 87, 34, 0.2); padding: 0.8rem; border-radius: 5px; border-left: 4px solid #FF5722;"><strong>🔄 Revision Request:</strong> ${escapeHtml(quote.revisionRequest)}</p>` : ''}
         ${quote.revisionFee > 0 ? `<p><strong>Revision Fee:</strong> ₱${quote.revisionFee.toLocaleString()}</p>` : ''}
         ${quote.revisionCount > 0 ? `<p><strong>Revisions Made:</strong> ${quote.revisionCount}</p>` : ''}
         </div>
-        
+
         <div class="quote-actions">
           ${quote.status === 'accepted' ? `
             <button class="btn" style="background: #00BCD4; color: white;" onclick="updateQuoteStatus('${quote._id}', 'in_progress')">
@@ -703,21 +715,21 @@
             <button class="btn btn-success" onclick="updateQuoteStatus('${quote._id}', 'completed')">
               ✅ Mark as Completed
             </button>
-            <button class="btn btn-primary" onclick="openResponseModal('${quote._id}', '${quote.projectName}')">
+            <button class="btn btn-primary" onclick="openResponseModal('${quote._id}')">
               ✏️ Update Notes
             </button>
           ` : quote.status === 'completed' ? `
           <span style="color: #8BC34A; font-weight: 600;">✅ Project Completed</span>
           ${quote.revisionRequest ? `<p style="color: #ddd; font-size: 0.9rem; margin-top: 0.5rem;">Revision requests are handled by clients.</p>` : ''}
         ` : quote.status === 'revision_requested' ? `
-          <button class="btn" style="background: #4CAF50; color: white;" onclick="openRevisionModal('${quote._id}', '${quote.projectName}', '${quote.revisionRequest || ''}')">
+          <button class="btn" style="background: #4CAF50; color: white;" onclick="openRevisionModal('${quote._id}')">
             ✅ Review & Accept Revision
           </button>
           <button class="btn btn-danger" onclick="rejectRevision('${quote._id}')">
             ❌ Reject Revision
           </button>
           ` : `
-            <button class="btn btn-primary" onclick="openResponseModal('${quote._id}', '${quote.projectName}')">
+            <button class="btn btn-primary" onclick="openResponseModal('${quote._id}')">
               Respond
             </button>
           `}
@@ -745,9 +757,10 @@
   }
   
   // Open response modal
-  function openResponseModal(quoteId, projectName) {
+  function openResponseModal(quoteId) {
+    const quote = allQuotations.find(q => q._id === quoteId);
     document.getElementById('quoteId').value = quoteId;
-    document.getElementById('modalProjectName').textContent = projectName;
+    document.getElementById('modalProjectName').textContent = quote ? quote.projectName : '';
     document.getElementById('responseModal').style.display = 'flex';
   }
   
@@ -830,10 +843,11 @@ async function updateQuoteStatus(quoteId, newStatus) {
 }
 
 // Open revision modal
-function openRevisionModal(quoteId, projectName, revisionRequest) {
+function openRevisionModal(quoteId) {
+  const quote = allQuotations.find(q => q._id === quoteId);
   document.getElementById('revisionQuoteId').value = quoteId;
-  document.getElementById('revisionProjectName').textContent = projectName;
-  document.getElementById('revisionRequestText').textContent = revisionRequest || 'No details provided';
+  document.getElementById('revisionProjectName').textContent = quote ? quote.projectName : '';
+  document.getElementById('revisionRequestText').textContent = (quote && quote.revisionRequest) || 'No details provided';
   document.getElementById('revisionModal').style.display = 'flex';
 }
 

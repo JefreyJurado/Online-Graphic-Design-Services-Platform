@@ -451,6 +451,20 @@
     }
   }
 
+  // Escape untrusted text before inserting into innerHTML (prevents stored XSS
+  // from quotation fields, which can contain arbitrary attacker-supplied text)
+  function escapeHtml(value) {
+    if (value === null || value === undefined) return '';
+    return String(value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  let currentQuotations = [];
+
   // Fetch user's quotations
   async function fetchMyQuotes() {
     try {
@@ -477,6 +491,7 @@
   
   // Display quotes
   function displayQuotes(quotations) {
+    currentQuotations = quotations;
     const container = document.getElementById('quotesContainer');
     container.style.display = 'block';
     
@@ -513,9 +528,9 @@
                     margin-bottom: 1rem;">
           <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
             <div>
-              <h3 style="color: #50c2f7; margin-bottom: 0.5rem;">${quote.projectName}</h3>
+              <h3 style="color: #50c2f7; margin-bottom: 0.5rem;">${escapeHtml(quote.projectName)}</h3>
               <p style="color: #ddd; margin: 0; font-size: 0.9rem;">
-                Service: <strong>${quote.service.name}</strong> (${quote.service.category})
+                Service: <strong>${escapeHtml(quote.service.name)}</strong> (${escapeHtml(quote.service.category)})
               </p>
             </div>
             <div style="background: ${statusColor}; color: white; padding: 0.5rem 1rem; 
@@ -525,40 +540,40 @@
           </div>
           
           <div style="color: #ddd; line-height: 1.6; margin-bottom: 1rem;">
-            <p style="margin: 0.3rem 0;"><strong>Budget:</strong> ${quote.budget}</p>
+            <p style="margin: 0.3rem 0;"><strong>Budget:</strong> ${escapeHtml(quote.budget)}</p>
             <p style="margin: 0.3rem 0;"><strong>Deadline:</strong> ${new Date(quote.deadline).toLocaleDateString()}</p>
             <p style="margin: 0.3rem 0;"><strong>Requested:</strong> ${dateRequested}</p>
             ${quote.quotedPrice > 0 ? `<p style="margin: 0.3rem 0;"><strong>Quoted Price:</strong> ₱${quote.quotedPrice.toLocaleString()}</p>` : ''}
             ${quote.revisionFee > 0 ? `<p style="margin: 0.3rem 0;"><strong>Revision Fee:</strong> ₱${quote.revisionFee.toLocaleString()}</p>` : ''}
             ${quote.revisionCount > 0 ? `<p style="margin: 0.3rem 0;"><strong>Revisions:</strong> ${quote.revisionCount}</p>` : ''}
           </div>
-          
+
           <details style="margin-top: 1rem;">
             <summary style="cursor: pointer; color: #50c2f7; font-weight: 600;">View Description</summary>
-            <p style="color: #ddd; margin-top: 0.5rem; padding: 1rem; background: rgba(0,0,0,0.2); 
-                      border-radius: 8px; line-height: 1.6;">${quote.description}</p>
+            <p style="color: #ddd; margin-top: 0.5rem; padding: 1rem; background: rgba(0,0,0,0.2);
+                      border-radius: 8px; line-height: 1.6;">${escapeHtml(quote.description)}</p>
           </details>
-          
+
           ${quote.adminNotes ? `
-            <div style="margin-top: 1rem; padding: 1rem; background: rgba(80, 194, 247, 0.1); 
+            <div style="margin-top: 1rem; padding: 1rem; background: rgba(80, 194, 247, 0.1);
                         border-left: 3px solid #50c2f7; border-radius: 5px;">
               <strong style="color: #50c2f7;">Admin Notes:</strong>
-              <p style="color: #ddd; margin: 0.5rem 0 0 0;">${quote.adminNotes}</p>
+              <p style="color: #ddd; margin: 0.5rem 0 0 0;">${escapeHtml(quote.adminNotes)}</p>
             </div>
           ` : ''}
 
           ${quote.revisionRequest ? `
-            <div style="margin-top: 1rem; padding: 1rem; background: rgba(255, 87, 34, 0.1); 
+            <div style="margin-top: 1rem; padding: 1rem; background: rgba(255, 87, 34, 0.1);
                         border-left: 3px solid #FF5722; border-radius: 5px;">
               <strong style="color: #FF5722;">🔄 Your Revision Request:</strong>
-              <p style="color: #ddd; margin: 0.5rem 0 0 0;">${quote.revisionRequest}</p>
+              <p style="color: #ddd; margin: 0.5rem 0 0 0;">${escapeHtml(quote.revisionRequest)}</p>
               ${quote.status === 'revision_requested' ? '<p style="color: #ff9800; margin-top: 0.5rem; font-size: 0.9rem;">⏳ Waiting for admin approval...</p>' : ''}
             </div>
           ` : ''}
-          
+
           ${quote.status === 'completed' && !quote.revisionRequest ? `
             <div style="margin-top: 1rem;">
-              <button class="btn btn-revision" onclick="openRevisionModal('${quote._id}', '${quote.projectName.replace(/'/g, "\\'")}')">
+              <button class="btn btn-revision" onclick="openRevisionModal('${quote._id}')">
                 🔄 Request Revision
               </button>
             </div>
@@ -569,9 +584,10 @@
   }
   
   // Open revision modal
-  function openRevisionModal(quoteId, projectName) {
+  function openRevisionModal(quoteId) {
+    const quote = currentQuotations.find(q => q._id === quoteId);
     document.getElementById('revisionQuoteId').value = quoteId;
-    document.getElementById('revisionProjectName').textContent = projectName;
+    document.getElementById('revisionProjectName').textContent = quote ? quote.projectName : '';
     document.getElementById('revisionModal').style.display = 'flex';
   }
   
