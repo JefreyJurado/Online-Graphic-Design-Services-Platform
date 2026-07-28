@@ -269,39 +269,10 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
 
-    // UPDATED Contact Form Handling
-    const contactForm = document.getElementById('contactForm');
-    if (contactForm) {
-      contactForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const name = this.querySelector('input[name="name"]').value;
-        const email = this.querySelector('input[name="email"]').value;
-        const message = this.querySelector('textarea[name="message"]').value;
-        
-        if (name && email && message) {
-          // Show success message
-          const successMessage = document.getElementById('successMessage');
-          if (successMessage) {
-            successMessage.style.display = 'block';
-          }
-          
-          // Clear the form
-          this.reset();
-          
-          // Hide success message after 5 seconds
-          setTimeout(function() {
-            if (successMessage) {
-              successMessage.style.display = 'none';
-            }
-          }, 5000);
-        } else {
-          // Show error toast
-          showToast('❌ Please fill in all fields');
-        }
-      });
-    }
-    
+    // Note: actual submit handling for #contactForm lives in 05_contact.html
+    // (EmailJS integration) so it can report real success/failure instead of
+    // always claiming success.
+
     // Enhanced contact card animations
     const contactCards = document.querySelectorAll('.contact-card');
     contactCards.forEach((card, index) => {
