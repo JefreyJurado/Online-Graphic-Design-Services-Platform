@@ -47,11 +47,11 @@ exports.register = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Registration error:', error);
-    res.status(500).json({ 
-      success: false, 
-      message: 'Registration failed', 
-      error: error.message 
+    console.error('❌ Registration error:', error.message);
+    res.status(500).json({
+      success: false,
+      message: 'Registration failed',
+      ...(process.env.NODE_ENV === 'development' && { error: error.message })
     });
   }
 };
@@ -107,11 +107,11 @@ exports.login = async (req, res) => {
     });
     
   } catch (error) {
-    console.error('❌ Login error:', error);
-    res.status(500).json({ 
-      success: false, 
-      message: 'Login failed', 
-      error: error.message 
+    console.error('❌ Login error:', error.message);
+    res.status(500).json({
+      success: false,
+      message: 'Login failed',
+      ...(process.env.NODE_ENV === 'development' && { error: error.message })
     });
   }
 };

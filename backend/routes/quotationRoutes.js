@@ -2,8 +2,8 @@ const express = require('express');
 const router = express.Router();
 const { protect, adminOnly } = require('../middleware/authMiddleware');
 const { validateReferenceImages } = require('../validators/imageValidator');
-const { quotationLimiter } = require('../middleware/rateLimiter'); 
-const { validateObjectId } = require('../middleware/validation');
+const { quotationLimiter } = require('../middleware/rateLimiter');
+const { validateObjectId, validateQuotation, validateQuotationStatus } = require('../middleware/validation');
 const {
   createQuotation,
   getMyQuotations,
@@ -34,7 +34,7 @@ const optionalAuth = async (req, res, next) => {
 };
 
 // Public/Guest routes - ADD RATE LIMITER
-router.post('/', optionalAuth, quotationLimiter, validateReferenceImages, createQuotation); 
+router.post('/', optionalAuth, quotationLimiter, validateQuotation, validateReferenceImages, createQuotation);
 
 // Protected client routes - ADD VALIDATION
 router.get('/my-quotations', protect, getMyQuotations);
@@ -46,7 +46,7 @@ router.patch('/:id/images/remove', protect, validateObjectId('id'), removeImages
 
 // Admin routes - ADD VALIDATION
 router.get('/', protect, adminOnly, getAllQuotations);
-router.put('/:id', protect, validateObjectId('id'), updateQuotation); 
+router.put('/:id', protect, validateObjectId('id'), validateQuotationStatus, updateQuotation);
 router.delete('/:id', protect, adminOnly, validateObjectId('id'), deleteQuotation); 
 
 module.exports = router;

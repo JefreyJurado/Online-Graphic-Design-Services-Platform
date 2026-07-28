@@ -7,11 +7,16 @@ const { protect } = require('../middleware/authMiddleware');
 const passport = require('../config/passport');
 const jwt = require('jsonwebtoken');
 const { authLimiter } = require('../middleware/rateLimiter');
-const { 
-  validateRegister, 
-  validateLogin, 
-  validateChangePassword 
+const {
+  validateRegister,
+  validateLogin,
+  validateChangePassword
 } = require('../middleware/validation');
+
+// Fallback only covers the current production deployment; every environment
+// should really set FRONTEND_URL itself.
+const DEFAULT_FRONTEND_URL = 'https://jefrey-design.vercel.app';
+const FRONTEND_URL = process.env.FRONTEND_URL || DEFAULT_FRONTEND_URL;
 
 // Apply rate limiter and validation to auth routes
 router.post('/register', authLimiter, validateRegister, authController.register); 
@@ -28,17 +33,12 @@ router.get(
 
 router.get(
   '/google/callback',
-  passport.authenticate('google', { 
+  passport.authenticate('google', {
     session: false,
-    failureRedirect: 'https://jefrey-design.vercel.app/login.html'
+    failureRedirect: `${FRONTEND_URL}/login.html`
   }),
   (req, res) => {
     try {
-      console.log('🎯 Google callback hit!');
-      console.log('📍 Request host:', req.get('host'));
-      console.log('📍 Request protocol:', req.protocol);
-      console.log('📍 Referer:', req.get('referer'));
-      
       const token = jwt.sign(
         { id: req.user._id, role: req.user.role },
         process.env.JWT_SECRET,
@@ -56,29 +56,10 @@ router.get(
         dateRegistered: req.user.dateRegistered
       }));
 
-      // Detect frontend URL from request
-      let frontendURL;
-      const host = req.get('host');
-      
-      if (host && host.includes('vercel.app')) {
-        // Production - use production frontend
-        frontendURL = 'https://jefrey-design.vercel.app';
-      } else if (host && host.includes('localhost')) {
-        // Local development
-        frontendURL = 'http://127.0.0.1:5500';
-      } else {
-        // Fallback to production
-        frontendURL = 'https://jefrey-design.vercel.app';
-      }
-
-      console.log('🔀 Detected frontendURL:', frontendURL);
-      console.log('🔀 Full redirect URL:', `${frontendURL}/google-auth-success.html`);
-
-      res.redirect(`${frontendURL}/google-auth-success.html?token=${token}&user=${userData}`);
+      res.redirect(`${FRONTEND_URL}/google-auth-success.html?token=${token}&user=${userData}`);
     } catch (error) {
       console.error('❌ Google callback error:', error);
-      console.error('❌ Stack:', error.stack);
-      res.redirect('https://jefrey-design.vercel.app/login.html?error=auth_failed');
+      res.redirect(`${FRONTEND_URL}/login.html?error=auth_failed`);
     }
   }
 );

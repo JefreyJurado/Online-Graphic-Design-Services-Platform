@@ -1,5 +1,9 @@
 const nodemailer = require('nodemailer');
 
+// Fallback only covers the current production deployment; every environment
+// should really set FRONTEND_URL itself.
+const FRONTEND_URL = process.env.FRONTEND_URL || 'https://jefrey-design.vercel.app';
+
 // Create email transporter
 const transporter = nodemailer.createTransport({
   host: process.env.EMAIL_HOST,
@@ -80,9 +84,9 @@ exports.sendQuoteResponseEmail = async (quote) => {
                 <strong>Want to track your quote in real-time?</strong><br>
                 Create a free account to view updates and manage your projects!
               </p>
-              <a href="https://jefrey-design.vercel.app/register.html" class="button">Create Account</a>
+              <a href="${FRONTEND_URL}/register.html" class="button">Create Account</a>
             ` : `
-              <a href="https://jefrey-design.vercel.app/client-dashboard.html" class="button">View Dashboard</a>
+              <a href="${FRONTEND_URL}/client-dashboard.html" class="button">View Dashboard</a>
             `}
             
             <div class="footer">

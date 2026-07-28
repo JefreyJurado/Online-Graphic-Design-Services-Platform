@@ -1,4 +1,4 @@
-const { body, param, query, validationResult } = require('express-validator');
+const { body, param, validationResult } = require('express-validator');
 
 // Middleware to handle validation errors
 const handleValidationErrors = (req, res, next) => {
@@ -75,32 +75,70 @@ const validateChangePassword = [
   handleValidationErrors
 ];
 
-// Service validation
+// Service validation (fields/enum match backend/models/Service.js)
+const SERVICE_CATEGORIES = ['Logo Design', 'Branding', 'Social Media', 'Print Design', 'Packaging', 'Web Design', 'Other'];
+
 const validateService = [
   body('name')
     .trim()
     .notEmpty().withMessage('Service name is required')
     .isLength({ min: 3, max: 100 }).withMessage('Service name must be between 3 and 100 characters'),
-  
+
   body('category')
     .trim()
     .notEmpty().withMessage('Category is required')
-    .isIn(['Logo Design', 'Branding', 'Print Design', 'Digital Design', 'Packaging', 'Illustration', 'Other'])
+    .isIn(SERVICE_CATEGORIES)
     .withMessage('Invalid category'),
-  
+
   body('description')
     .trim()
     .notEmpty().withMessage('Description is required')
     .isLength({ min: 10, max: 1000 }).withMessage('Description must be between 10 and 1000 characters'),
-  
-  body('basePrice')
-    .notEmpty().withMessage('Base price is required')
-    .isFloat({ min: 0 }).withMessage('Base price must be a positive number'),
-  
-  body('deliveryTime')
+
+  body('price')
+    .notEmpty().withMessage('Price is required')
+    .isFloat({ min: 0 }).withMessage('Price must be a positive number'),
+
+  body('duration')
+    .trim()
+    .notEmpty().withMessage('Duration is required')
+    .isLength({ max: 50 }).withMessage('Duration must be less than 50 characters'),
+
+  handleValidationErrors
+];
+
+// Service update validation — same fields, all optional (controller does a
+// partial update: only fields present in the body get changed).
+const validateServiceUpdate = [
+  body('name')
     .optional()
-    .isInt({ min: 1 }).withMessage('Delivery time must be at least 1 day'),
-  
+    .trim()
+    .isLength({ min: 3, max: 100 }).withMessage('Service name must be between 3 and 100 characters'),
+
+  body('category')
+    .optional()
+    .trim()
+    .isIn(SERVICE_CATEGORIES)
+    .withMessage('Invalid category'),
+
+  body('description')
+    .optional()
+    .trim()
+    .isLength({ min: 10, max: 1000 }).withMessage('Description must be between 10 and 1000 characters'),
+
+  body('price')
+    .optional()
+    .isFloat({ min: 0 }).withMessage('Price must be a positive number'),
+
+  body('duration')
+    .optional()
+    .trim()
+    .isLength({ max: 50 }).withMessage('Duration must be less than 50 characters'),
+
+  body('isActive')
+    .optional()
+    .isBoolean().withMessage('isActive must be true or false'),
+
   handleValidationErrors
 ];
 
@@ -123,7 +161,7 @@ const validateQuotation = [
   body('budget')
     .trim()
     .notEmpty().withMessage('Budget is required')
-    .isIn(['Under ₱5,000', '₱5,000 - ₱10,000', '₱10,000 - ₱20,000', 'Above ₱20,000'])
+    .isIn(['₱1,000 - ₱3,000', '₱3,000 - ₱5,000', '₱5,000 - ₱10,000', '₱10,000 - ₱20,000', '₱20,000+', 'Flexible'])
     .withMessage('Invalid budget range'),
   
   body('deadline')
@@ -139,17 +177,27 @@ const validateQuotation = [
       return true;
     }),
   
-  body('contactEmail')
+  body('guestName')
+    .optional()
+    .trim()
+    .isLength({ min: 2, max: 50 }).withMessage('Guest name must be between 2 and 50 characters'),
+
+  body('guestEmail')
     .optional()
     .trim()
     .isEmail().withMessage('Invalid email format')
     .normalizeEmail(),
-  
-  body('contactPhone')
+
+  body('guestPhone')
     .optional()
     .trim()
     .matches(/^[0-9+\-\s()]+$/).withMessage('Invalid phone number format'),
-  
+
+  body('additionalInfo')
+    .optional()
+    .trim()
+    .isLength({ max: 1000 }).withMessage('Additional info must be less than 1000 characters'),
+
   handleValidationErrors
 ];
 
@@ -189,25 +237,11 @@ const validateQuotationStatus = [
     .optional()
     .trim()
     .isLength({ max: 1000 }).withMessage('Revision request must be less than 1000 characters'),
-  
-  handleValidationErrors
-];
 
-// Unsplash search validation
-const validateUnsplashSearch = [
-  query('query')
-    .trim()
-    .notEmpty().withMessage('Search query is required')
-    .isLength({ min: 2, max: 100 }).withMessage('Query must be between 2 and 100 characters'),
-  
-  query('page')
+  body('revisionFee')
     .optional()
-    .isInt({ min: 1, max: 100 }).withMessage('Page must be between 1 and 100'),
-  
-  query('per_page')
-    .optional()
-    .isInt({ min: 1, max: 30 }).withMessage('Per page must be between 1 and 30'),
-  
+    .isFloat({ min: 0 }).withMessage('Revision fee must be a positive number'),
+
   handleValidationErrors
 ];
 
@@ -216,9 +250,9 @@ module.exports = {
   validateLogin,
   validateChangePassword,
   validateService,
+  validateServiceUpdate,
   validateQuotation,
   validateObjectId,
   validateQuotationStatus,
-  validateUnsplashSearch,
   handleValidationErrors
 };

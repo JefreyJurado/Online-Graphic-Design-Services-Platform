@@ -9,21 +9,14 @@ const Service = require('../models/Service');
 // @route   POST /api/upload/profile
 // @desc    Upload profile picture
 // @access  Private
-router.post('/profile', protect, uploadLimiter, uploadProfilePicture.single('profilePicture'), async (req, res) => { // ← ADD uploadLimiter
-  console.log('🔵 UPLOAD ROUTE HIT!');
-  console.log('📁 File:', req.file);
-  console.log('👤 User:', req.user);
-  
+router.post('/profile', protect, uploadLimiter, uploadProfilePicture.single('profilePicture'), async (req, res) => {
   try {
     if (!req.file) {
-      console.log('❌ No file uploaded');
       return res.status(400).json({
         success: false,
         message: 'Please upload an image file'
       });
     }
-
-    console.log('✅ File uploaded to S3:', req.file.location);
 
     // Update user's profile picture in database
     const user = await User.findByIdAndUpdate(
@@ -31,8 +24,6 @@ router.post('/profile', protect, uploadLimiter, uploadProfilePicture.single('pro
       { profilePicture: req.file.location },
       { new: true, runValidators: true }
     ).select('-password');
-
-    console.log('✅ User updated in database');
 
     res.status(200).json({
       success: true,
@@ -43,12 +34,11 @@ router.post('/profile', protect, uploadLimiter, uploadProfilePicture.single('pro
       }
     });
   } catch (error) {
-    console.error('❌ Profile upload error:', error);
-    console.error('Error stack:', error.stack);
+    console.error('❌ Profile upload error:', error.message);
     res.status(500).json({
       success: false,
       message: 'Error uploading profile picture',
-      error: error.message
+      ...(process.env.NODE_ENV === 'development' && { error: error.message })
     });
   }
 });
@@ -56,7 +46,7 @@ router.post('/profile', protect, uploadLimiter, uploadProfilePicture.single('pro
 // @route   POST /api/upload/service/:serviceId
 // @desc    Upload service image
 // @access  Private (Admin only)
-router.post('/service/:serviceId', protect, uploadLimiter, uploadServiceImage.single('serviceImage'), async (req, res) => { // ← ADD uploadLimiter
+router.post('/service/:serviceId', protect, uploadLimiter, uploadServiceImage.single('serviceImage'), async (req, res) => {
   try {
     // Check if user is admin
     if (req.user.role !== 'admin') {
@@ -98,11 +88,11 @@ router.post('/service/:serviceId', protect, uploadLimiter, uploadServiceImage.si
       }
     });
   } catch (error) {
-    console.error('Service image upload error:', error);
+    console.error('Service image upload error:', error.message);
     res.status(500).json({
       success: false,
       message: 'Error uploading service image',
-      error: error.message
+      ...(process.env.NODE_ENV === 'development' && { error: error.message })
     });
   }
 });
@@ -149,11 +139,11 @@ router.delete('/service/:serviceId/image', protect, async (req, res) => {
       data: service
     });
   } catch (error) {
-    console.error('Delete service image error:', error);
+    console.error('Delete service image error:', error.message);
     res.status(500).json({
       success: false,
       message: 'Error deleting service image',
-      error: error.message
+      ...(process.env.NODE_ENV === 'development' && { error: error.message })
     });
   }
 });

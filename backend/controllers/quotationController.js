@@ -320,11 +320,11 @@ exports.addImagesToQuotation = async (req, res) => {
       imagesAdded: images.length
     });
   } catch (error) {
-    console.error('Add images error:', error);
+    console.error('Add images error:', error.message);
     res.status(500).json({
       success: false,
       message: 'Failed to add images',
-      error: error.message
+      ...(process.env.NODE_ENV === 'development' && { error: error.message })
     });
   }
 };
@@ -391,11 +391,11 @@ exports.removeImagesFromQuotation = async (req, res) => {
       imagesRemoved: removedCount
     });
   } catch (error) {
-    console.error('Remove images error:', error);
+    console.error('Remove images error:', error.message);
     res.status(500).json({
       success: false,
       message: 'Failed to remove images',
-      error: error.message
+      ...(process.env.NODE_ENV === 'development' && { error: error.message })
     });
   }
 };

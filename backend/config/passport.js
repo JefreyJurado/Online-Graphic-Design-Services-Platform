@@ -2,16 +2,23 @@ const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const User = require('../models/User');
 
+// Fallback only covers the current production deployment; every environment
+// should really set GOOGLE_CALLBACK_URL itself (it must match the redirect
+// URI registered in the Google Cloud Console for that environment).
+const DEFAULT_CALLBACK_URL = 'https://online-graphic-design-services-plat.vercel.app/api/auth/google/callback';
+const callbackURL = process.env.GOOGLE_CALLBACK_URL || DEFAULT_CALLBACK_URL;
+
 console.log('🔍 Checking Google OAuth credentials...');
 console.log('GOOGLE_CLIENT_ID:', process.env.GOOGLE_CLIENT_ID ? '✅ Found' : '❌ Missing');
 console.log('GOOGLE_CLIENT_SECRET:', process.env.GOOGLE_CLIENT_SECRET ? '✅ Found' : '❌ Missing');
+console.log('GOOGLE_CALLBACK_URL:', process.env.GOOGLE_CALLBACK_URL ? `✅ Found (${callbackURL})` : `⚠️ Missing, using default (${callbackURL})`);
 
 passport.use(
   new GoogleStrategy(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: 'https://online-graphic-design-services-plat.vercel.app/api/auth/google/callback'
+      callbackURL
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
@@ -30,6 +37,7 @@ passport.use(
           return done(null, user);
         }
 
+        // No password: the schema only requires one when googleId is unset.
         const newUser = await User.create({
           googleId: profile.id,
           name: profile.displayName,
@@ -37,8 +45,7 @@ passport.use(
           profilePicture: profile.photos[0]?.value,
           role: 'client',
           phone: '',
-          address: '',
-          password: Math.random().toString(36).slice(-8)
+          address: ''
         });
 
         done(null, newUser);
