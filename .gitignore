@@ -15,6 +15,9 @@ Thumbs.db
 .idea/
 .claude/
 
+# Vercel
+.vercel/
+
 # Logs
 *.log
 npm-debug.log*
