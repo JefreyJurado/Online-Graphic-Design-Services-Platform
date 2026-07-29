@@ -2,7 +2,22 @@ const nodemailer = require('nodemailer');
 
 // Fallback only covers the current production deployment; every environment
 // should really set FRONTEND_URL itself.
-const FRONTEND_URL = process.env.FRONTEND_URL || 'https://jefreyjurado.github.io/Online-Graphic-Design-Services-Platform/';
+const DEFAULT_FRONTEND_URL = 'https://jefreyjurado.github.io/Online-Graphic-Design-Services-Platform';
+// Strip any trailing slash so `${FRONTEND_URL}/page.html` never produces a
+// double slash, regardless of whether the env var was set with one.
+const FRONTEND_URL = (process.env.FRONTEND_URL || DEFAULT_FRONTEND_URL).replace(/\/+$/, '');
+
+// Escape untrusted text before inserting into outbound HTML emails (project
+// names, admin notes, and guest/client names are all free-text user input)
+function escapeHtml(value) {
+  if (value === null || value === undefined) return '';
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
 
 // Create email transporter
 const transporter = nodemailer.createTransport({
@@ -58,24 +73,24 @@ exports.sendQuoteResponseEmail = async (quote) => {
           </div>
           
           <div class="content">
-            <p>Hi <strong>${recipientName}</strong>,</p>
-            <p>Good news! We've updated your quote request for "<strong>${quote.projectName}</strong>".</p>
-            
+            <p>Hi <strong>${escapeHtml(recipientName)}</strong>,</p>
+            <p>Good news! We've updated your quote request for "<strong>${escapeHtml(quote.projectName)}</strong>".</p>
+
             <div class="status-badge status-${quote.status}">
               ${statusEmojis[quote.status] || '📋'} Status: ${quote.status.replace('_', ' ').toUpperCase()}
             </div>
-            
+
             <div class="info-box">
-              <p><strong>Project:</strong> ${quote.projectName}</p>
-              <p><strong>Service:</strong> ${quote.service.name}</p>
+              <p><strong>Project:</strong> ${escapeHtml(quote.projectName)}</p>
+              <p><strong>Service:</strong> ${escapeHtml(quote.service.name)}</p>
               ${quote.quotedPrice > 0 ? `<p><strong>Quoted Price:</strong> ₱${quote.quotedPrice.toLocaleString()}</p>` : ''}
               <p><strong>Deadline:</strong> ${new Date(quote.deadline).toLocaleDateString()}</p>
             </div>
-            
+
             ${quote.adminNotes ? `
               <h3>Message from Jefrey:</h3>
               <p style="background: #fff3cd; padding: 15px; border-left: 4px solid #ff9800; border-radius: 5px;">
-                ${quote.adminNotes}
+                ${escapeHtml(quote.adminNotes)}
               </p>
             ` : ''}
             

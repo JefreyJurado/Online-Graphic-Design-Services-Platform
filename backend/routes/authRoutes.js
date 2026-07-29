@@ -15,8 +15,10 @@ const {
 
 // Fallback only covers the current production deployment; every environment
 // should really set FRONTEND_URL itself.
-const DEFAULT_FRONTEND_URL = 'https://jefreyjurado.github.io/Online-Graphic-Design-Services-Platform/';
-const FRONTEND_URL = process.env.FRONTEND_URL || DEFAULT_FRONTEND_URL;
+const DEFAULT_FRONTEND_URL = 'https://jefreyjurado.github.io/Online-Graphic-Design-Services-Platform';
+// Strip any trailing slash so `${FRONTEND_URL}/page.html` never produces a
+// double slash, regardless of whether the env var was set with one.
+const FRONTEND_URL = (process.env.FRONTEND_URL || DEFAULT_FRONTEND_URL).replace(/\/+$/, '');
 
 // Apply rate limiter and validation to auth routes
 router.post('/register', authLimiter, validateRegister, authController.register); 
@@ -40,7 +42,7 @@ router.get(
   (req, res) => {
     try {
       const token = jwt.sign(
-        { id: req.user._id, role: req.user.role },
+        { id: req.user._id, role: req.user.role, tokenVersion: req.user.tokenVersion },
         process.env.JWT_SECRET,
         { expiresIn: '7d' }
       );
@@ -65,7 +67,7 @@ router.get(
 );
 
 // Change Password Route - ADD VALIDATION
-router.put('/change-password', protect, validateChangePassword, async (req, res) => { 
+router.put('/change-password', protect, authLimiter, validateChangePassword, async (req, res) => {
   try {
     const { currentPassword, newPassword } = req.body;
 
@@ -91,13 +93,25 @@ router.put('/change-password', protect, validateChangePassword, async (req, res)
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(newPassword, salt);
 
-    await User.findByIdAndUpdate(req.user.id, { 
-      password: hashedPassword 
-    });
+    // Bumping tokenVersion invalidates every token issued before this
+    // point (including a stolen one), not just the one making this request.
+    const updatedUser = await User.findByIdAndUpdate(req.user.id, {
+      password: hashedPassword,
+      $inc: { tokenVersion: 1 }
+    }, { new: true });
 
-    res.json({ 
-      success: true, 
-      message: 'Password changed successfully' 
+    // Issue a fresh token so the session that just changed the password
+    // doesn't immediately get logged out by its own tokenVersion bump.
+    const token = jwt.sign(
+      { id: updatedUser._id, role: updatedUser.role, tokenVersion: updatedUser.tokenVersion },
+      process.env.JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    res.json({
+      success: true,
+      message: 'Password changed successfully',
+      token
     });
 
   } catch (error) {

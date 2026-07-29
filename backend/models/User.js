@@ -48,6 +48,12 @@ const userSchema = new mongoose.Schema({
   dateRegistered: {
     type: Date,
     default: Date.now
+  },
+  // Bumped whenever the password changes, so JWTs issued before that point
+  // stop being accepted even though they haven't expired yet.
+  tokenVersion: {
+    type: Number,
+    default: 0
   }
 });
 

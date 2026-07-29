@@ -32,6 +32,17 @@ exports.protect = async (req, res, next) => {
         });
       }
 
+      // Reject tokens issued before the user's last password change, even
+      // if they haven't expired yet (tokens predating this field decode
+      // tokenVersion as undefined, which is treated as version 0).
+      const tokenVersion = decoded.tokenVersion || 0;
+      if (tokenVersion !== (req.user.tokenVersion || 0)) {
+        return res.status(401).json({
+          success: false,
+          message: 'Token is invalid or has expired. Please login again.'
+        });
+      }
+
       next();
     } catch (error) {
       return res.status(401).json({
@@ -104,43 +115,5 @@ exports.authorize = (...roles) => {
     }
 
     next();
-  };
-};
-
-// Check if user owns the resource
-exports.checkOwnership = (Model) => {
-  return async (req, res, next) => {
-    try {
-      const resourceId = req.params.id;
-      const resource = await Model.findById(resourceId);
-
-      if (!resource) {
-        return res.status(404).json({
-          success: false,
-          message: 'Resource not found'
-        });
-      }
-
-      // Admin can access anything
-      if (req.user.role === 'admin') {
-        return next();
-      }
-
-      // Check if user owns the resource
-      if (resource.user && resource.user.toString() !== req.user.id) {
-        return res.status(403).json({
-          success: false,
-          message: 'Not authorized to access this resource'
-        });
-      }
-
-      next();
-    } catch (error) {
-      console.error('Ownership check error:', error);
-      res.status(500).json({
-        success: false,
-        message: 'Server error checking ownership'
-      });
-    }
   };
 };

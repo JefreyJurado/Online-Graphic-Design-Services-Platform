@@ -1,8 +1,8 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 
-const generateToken = (id, role) => {
-  return jwt.sign({ id, role }, process.env.JWT_SECRET, { expiresIn: '7d' });
+const generateToken = (id, role, tokenVersion) => {
+  return jwt.sign({ id, role, tokenVersion }, process.env.JWT_SECRET, { expiresIn: '7d' });
 };
 
 // Register function - Creates new user account
@@ -28,7 +28,7 @@ exports.register = async (req, res) => {
 
     // Generate JWT token for the new user
     // Uses the helper function, Stores: user ID, user role (e.g., admin / client)
-    const token = generateToken(user._id, user.role);
+    const token = generateToken(user._id, user.role, user.tokenVersion);
     
     // Send response to client with ALL user data including profilePicture
     res.status(201).json({
@@ -88,7 +88,7 @@ exports.login = async (req, res) => {
     }
     
     // Generate JWT token upon successful login
-    const token = generateToken(user._id, user.role);
+    const token = generateToken(user._id, user.role, user.tokenVersion);
     
     // ✅ Send response with token and COMPLETE user info including profilePicture
     res.json({
