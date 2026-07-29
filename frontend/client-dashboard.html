@@ -411,10 +411,26 @@
     ? 'http://localhost:5000/api'
     : 'https://online-graphic-design-services-plat.vercel.app/api';
   
+  // If the API ever returns 401 (expired/invalid token), clear the stale
+  // session and send the user back to login instead of leaving a silently
+  // broken dashboard.
+  (function() {
+    const _origFetch = window.fetch;
+    window.fetch = async function(...args) {
+      const response = await _origFetch(...args);
+      if (response.status === 401 && localStorage.getItem('token')) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = 'login.html';
+      }
+      return response;
+    };
+  })();
+
   // Check if user is logged in
   const token = localStorage.getItem('token');
   const user = JSON.parse(localStorage.getItem('user') || '{}');
-  
+
   if (!token) {
     window.location.href = 'login.html';
   } else {
@@ -668,6 +684,12 @@
       const data = await response.json();
       
       if (data.success) {
+        // Changing the password invalidates every token issued before this
+        // moment, including the one this request was made with — store the
+        // fresh one the backend returns so this session doesn't get logged out.
+        if (data.token) {
+          localStorage.setItem('token', data.token);
+        }
         messageDiv.innerHTML = '<div style="background: #4CAF50; color: white; padding: 1rem; border-radius: 5px;">Password changed successfully!</div>';
         document.getElementById('changePasswordForm').reset();
       } else {

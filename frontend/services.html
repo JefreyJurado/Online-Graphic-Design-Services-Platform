@@ -259,10 +259,24 @@ const API_URL = (window.location.hostname === 'localhost' || window.location.hos
   let allServices = [];
   let currentCategory = 'all';
   
+  // If the API ever returns 401 (expired/invalid token), clear the stale
+  // session instead of leaving the page in a half-logged-in state.
+  (function() {
+    const _origFetch = window.fetch;
+    window.fetch = async function(...args) {
+      const response = await _origFetch(...args);
+      if (response.status === 401 && localStorage.getItem('token')) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+      }
+      return response;
+    };
+  })();
+
   // Check if user is logged in
   const token = localStorage.getItem('token');
   const user = JSON.parse(localStorage.getItem('user') || '{}');
-  
+
   if (token && user.name) {
     document.getElementById('authLink').textContent = 'Logout';
     document.getElementById('authLink').href = '#';

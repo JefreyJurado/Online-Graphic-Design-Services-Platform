@@ -28,6 +28,18 @@ function truncateDescription(description) {
   return description.substring(0, 497) + '...';
 }
 
+// Escape untrusted text before inserting into innerHTML (Unsplash photographer
+// names and descriptions are attacker-controllable third-party data)
+function escapeHtml(value) {
+  if (value === null || value === undefined) return '';
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 // Add image search section to quotation form
 function addImageSearchToForm() {
   const form = document.getElementById('quoteForm');
@@ -134,7 +146,7 @@ async function searchImages(query) {
   const perPage = 12; // Number of results to fetch
   
   try {
-    const response = await fetch(`${API_BASE_URL}/api/unsplash/search?query=${query}&per_page=${perPage}`);
+    const response = await fetch(`${API_BASE_URL}/api/unsplash/search?query=${encodeURIComponent(query)}&per_page=${perPage}`);
     
     const data = await response.json();
     document.getElementById('searchLoader').style.display = 'none';
@@ -199,11 +211,11 @@ function createImageCard(image) {
       class="image-card ${isSelected ? 'selected' : ''} ${isDisabled ? 'disabled' : ''}"
       style="cursor: ${isDisabled ? 'not-allowed' : 'pointer'};"
     >
-      <img src="${image.thumbUrl}" alt="${image.description || 'Design inspiration'}" />
+      <img src="${image.thumbUrl}" alt="${escapeHtml(image.description) || 'Design inspiration'}" />
       ${isSelected ? '<div class="checkmark">✓</div>' : ''}
       ${isDisabled ? '<div class="disabled-overlay">Limit reached</div>' : ''}
       <div class="photographer-credit">
-        Photo by ${image.photographer.name}
+        Photo by ${escapeHtml(image.photographer.name)}
       </div>
     </div>
   `;
@@ -280,15 +292,15 @@ function updateSelectedImagesPreview() {
   
   grid.innerHTML = selectedImages.map(image => `
     <div class="selected-image-item">
-      <img src="${image.thumbUrl}" alt="${image.description || ''}" />
-      <button 
-        type="button" 
-        class="remove-image-btn" 
-        onclick="removeSelectedImage('${image.unsplashId}')"
+      <img src="${image.thumbUrl}" alt="${escapeHtml(image.description) || ''}" />
+      <button
+        type="button"
+        class="remove-image-btn"
+        onclick="removeSelectedImage('${escapeHtml(image.unsplashId)}')"
       >
         ✕
       </button>
-      <small>${image.photographer.name}</small>
+      <small>${escapeHtml(image.photographer.name)}</small>
     </div>
   `).join('');
 }

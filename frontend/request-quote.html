@@ -358,12 +358,38 @@ const API_URL = (window.location.hostname === 'localhost' || window.location.hos
   const user = JSON.parse(localStorage.getItem('user') || '{}');
   
   const isLoggedIn = !!token;
-  
+
+  // If the API ever returns 401 (expired/invalid token), clear the stale
+  // session instead of leaving the page in a half-logged-in state.
+  (function() {
+    const _origFetch = window.fetch;
+    window.fetch = async function(...args) {
+      const response = await _origFetch(...args);
+      if (response.status === 401 && localStorage.getItem('token')) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+      }
+      return response;
+    };
+  })();
+
+  // Escape untrusted text before inserting into innerHTML (user.name comes
+  // from the stored profile and isn't sanitized at registration time)
+  function escapeHtml(value) {
+    if (value === null || value === undefined) return '';
+    return String(value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
   // Update UI based on login status
   if (isLoggedIn) {
     document.getElementById('userStatus').classList.add('logged-in');
-    document.getElementById('statusText').innerHTML = 
-      `✅ Logged in as <strong>${user.name}</strong> - Your quote will be tracked in your dashboard.`;
+    document.getElementById('statusText').innerHTML =
+      `✅ Logged in as <strong>${escapeHtml(user.name)}</strong> - Your quote will be tracked in your dashboard.`;
     document.getElementById('guestFields').style.display = 'none';
     
     // Remove required from guest fields when logged in

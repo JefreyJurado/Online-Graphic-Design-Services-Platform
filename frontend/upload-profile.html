@@ -283,10 +283,25 @@
 
         let selectedFile = null;
 
+        // If the API ever returns 401 (expired/invalid token), clear the
+        // stale session and send the user back to login.
+        (function() {
+            const _origFetch = window.fetch;
+            window.fetch = async function(...args) {
+                const response = await _origFetch(...args);
+                if (response.status === 401 && localStorage.getItem('token')) {
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('user');
+                    window.location.href = 'login.html';
+                }
+                return response;
+            };
+        })();
+
         // Check if user is logged in and set back link
         const token = localStorage.getItem('token');
         const user = JSON.parse(localStorage.getItem('user') || '{}');
-        
+
         if (!token) {
             window.location.href = 'login.html';
         } else {
