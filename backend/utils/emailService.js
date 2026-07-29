@@ -2,7 +2,7 @@ const nodemailer = require('nodemailer');
 
 // Fallback only covers the current production deployment; every environment
 // should really set FRONTEND_URL itself.
-const FRONTEND_URL = process.env.FRONTEND_URL || 'https://jefrey-design.vercel.app';
+const FRONTEND_URL = process.env.FRONTEND_URL || 'https://jefreyjurado.github.io/Online-Graphic-Design-Services-Platform/';
 
 // Create email transporter
 const transporter = nodemailer.createTransport({

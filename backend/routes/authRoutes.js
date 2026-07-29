@@ -15,7 +15,7 @@ const {
 
 // Fallback only covers the current production deployment; every environment
 // should really set FRONTEND_URL itself.
-const DEFAULT_FRONTEND_URL = 'https://jefrey-design.vercel.app';
+const DEFAULT_FRONTEND_URL = 'https://jefreyjurado.github.io/Online-Graphic-Design-Services-Platform/';
 const FRONTEND_URL = process.env.FRONTEND_URL || DEFAULT_FRONTEND_URL;
 
 // Apply rate limiter and validation to auth routes
