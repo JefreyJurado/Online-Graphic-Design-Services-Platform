@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { uploadProfilePicture, uploadServiceImage } = require('../middleware/upload');
-const { protect } = require('../middleware/authMiddleware');
+const { protect, adminOnly } = require('../middleware/authMiddleware');
 const { uploadLimiter } = require('../middleware/rateLimiter');
 const User = require('../models/User');
 const Service = require('../models/Service');
@@ -46,16 +46,8 @@ router.post('/profile', protect, uploadLimiter, uploadProfilePicture.single('pro
 // @route   POST /api/upload/service/:serviceId
 // @desc    Upload service image
 // @access  Private (Admin only)
-router.post('/service/:serviceId', protect, uploadLimiter, uploadServiceImage.single('serviceImage'), async (req, res) => {
+router.post('/service/:serviceId', protect, adminOnly, uploadLimiter, uploadServiceImage.single('serviceImage'), async (req, res) => {
   try {
-    // Check if user is admin
-    if (req.user.role !== 'admin') {
-      return res.status(403).json({
-        success: false,
-        message: 'Only admins can upload service images'
-      });
-    }
-
     if (!req.file) {
       return res.status(400).json({
         success: false,

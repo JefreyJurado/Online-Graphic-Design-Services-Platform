@@ -134,8 +134,10 @@ exports.getQuotationById = async (req, res) => {
       });
     }
     
-    // Check if user is authorized (client owns it or user is admin)
-    if (quotation.client && quotation.client._id.toString() !== req.user.id && req.user.role !== 'admin') {
+    // Check if user is authorized (client owns it or user is admin).
+    // Guest quotations have no client, so only an admin may view them.
+    const isOwner = quotation.client && quotation.client._id.toString() === req.user.id;
+    if (!isOwner && req.user.role !== 'admin') {
       return res.status(403).json({
         success: false,
         message: 'Not authorized to view this quotation'
@@ -193,8 +195,9 @@ exports.updateQuotation = async (req, res) => {
     
     // Allow clients to request revisions on their own quotes
     if (req.user.role === 'client') {
-      // Check if this is their quote
-      if (quotation.client && quotation.client.toString() !== req.user.id) {
+      // Check if this is their quote. Guest quotations have no client,
+      // so a client-role user is never authorized to touch one.
+      if (!quotation.client || quotation.client.toString() !== req.user.id) {
         return res.status(403).json({
           success: false,
           message: 'Not authorized to update this quotation'
@@ -277,14 +280,16 @@ exports.addImagesToQuotation = async (req, res) => {
       });
     }
     
-    // Check authorization (owner only)
-    if (quotation.client && quotation.client.toString() !== req.user.id) {
+    // Check authorization (owner or admin). Guest quotations have no
+    // client, so only an admin may modify one.
+    const isImageOwner = quotation.client && quotation.client.toString() === req.user.id;
+    if (!isImageOwner && req.user.role !== 'admin') {
       return res.status(403).json({
         success: false,
         message: 'You do not have permission to modify this quotation'
       });
     }
-    
+
     // Check status (cannot modify completed or in_progress)
     if (quotation.status === 'completed' || quotation.status === 'in_progress') {
       return res.status(403).json({
@@ -352,14 +357,16 @@ exports.removeImagesFromQuotation = async (req, res) => {
       });
     }
     
-    // Check authorization (owner only)
-    if (quotation.client && quotation.client.toString() !== req.user.id) {
+    // Check authorization (owner or admin). Guest quotations have no
+    // client, so only an admin may modify one.
+    const isImageOwner = quotation.client && quotation.client.toString() === req.user.id;
+    if (!isImageOwner && req.user.role !== 'admin') {
       return res.status(403).json({
         success: false,
         message: 'You do not have permission to modify this quotation'
       });
     }
-    
+
     // Check status
     if (quotation.status === 'completed' || quotation.status === 'in_progress') {
       return res.status(403).json({

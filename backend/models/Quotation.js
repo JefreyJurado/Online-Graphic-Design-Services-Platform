@@ -4,7 +4,8 @@ const quotationSchema = new mongoose.Schema({
   client: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: false
+    required: false,
+    index: true
   },
   guestInfo: {
     name: String,

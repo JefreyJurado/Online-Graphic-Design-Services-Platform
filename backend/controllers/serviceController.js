@@ -4,7 +4,6 @@ const Service = require('../models/Service');
 exports.getAllServices = async (req, res) => {
   try {
     const services = await Service.find({ isActive: true })
-      .populate('createdBy', 'name email')
       .sort({ dateCreated: -1 });
     
     res.status(200).json({
@@ -24,8 +23,7 @@ exports.getAllServices = async (req, res) => {
 // Get single service by ID
 exports.getServiceById = async (req, res) => {
   try {
-    const service = await Service.findById(req.params.id)
-      .populate('createdBy', 'name email');
+    const service = await Service.findById(req.params.id);
     
     if (!service) {
       return res.status(404).json({
