@@ -20,6 +20,7 @@ body {
 /* Navigation - Match Portfolio Style */
 nav {
   background-color: #3471cc21 !important;
+  -webkit-backdrop-filter: blur(10px) !important;
   backdrop-filter: blur(10px) !important;
   padding: 1rem 2rem !important;
   position: sticky !important;
@@ -51,6 +52,7 @@ nav a.active {
 /* Footer - Match Portfolio Style */
 footer {
   background-color: #3471cc21 !important;
+  -webkit-backdrop-filter: blur(10px) !important;
   backdrop-filter: blur(10px) !important;
   color: #ffffff !important;
   text-align: center;
@@ -85,6 +87,7 @@ h3 {
 .dashboard-card,
 .quote-card {
   background: rgba(255, 255, 255, 0.1) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
   backdrop-filter: blur(10px) !important;
   border: 1px solid rgba(255, 255, 255, 0.2) !important;
   color: #ffffff !important;

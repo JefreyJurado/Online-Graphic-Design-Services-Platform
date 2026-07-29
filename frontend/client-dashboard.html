@@ -26,6 +26,7 @@
 
     nav {
       background: rgba(52, 113, 204, 0.3);
+      -webkit-backdrop-filter: blur(10px);
       backdrop-filter: blur(10px);
       padding: 1rem 2rem;
       display: flex;
@@ -74,6 +75,7 @@
 
     .welcome-card {
       background: rgba(255, 255, 255, 0.1);
+      -webkit-backdrop-filter: blur(10px);
       backdrop-filter: blur(10px);
       padding: 2rem;
       border-radius: 15px;
@@ -140,6 +142,7 @@
 
     .dashboard-card {
       background: rgba(255, 255, 255, 0.1);
+      -webkit-backdrop-filter: blur(10px);
       backdrop-filter: blur(10px);
       padding: 2rem;
       border-radius: 15px;
@@ -265,6 +268,7 @@
 
     footer {
       background: rgba(52, 113, 204, 0.3);
+      -webkit-backdrop-filter: blur(10px);
       backdrop-filter: blur(10px);
       padding: 1rem;
       text-align: center;
@@ -280,7 +284,7 @@
   </div>
   <div class="nav-right">
     <span>Welcome, <strong id="userName">User</strong></span>
-    <button class="btn-logout" onclick="logout()">Logout</button>
+    <button type="button" class="btn-logout" onclick="logout()">Logout</button>
   </div>
 </nav>
 
@@ -301,7 +305,8 @@
 
   <!-- Change Password Section -->
   <div style="max-width: 600px; margin: 0 auto 3rem auto;">
-    <div style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); padding: 2rem; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.2);">
+    <div style="background: rgba(255, 255, 255, 0.1); -webkit-backdrop-filter: blur(10px);
+ backdrop-filter: blur(10px); padding: 2rem; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.2);">
       <h3 style="color: #50c2f7; margin-bottom: 1.5rem;">🔒 Change Password</h3>
       <form id="changePasswordForm">
         <div class="form-group">
@@ -373,7 +378,7 @@
   <div class="modal-content">
     <div class="modal-header">
       <h3>🔄 Request Revision</h3>
-      <button class="close-modal" onclick="closeRevisionModal()">&times;</button>
+      <button type="button" class="close-modal" onclick="closeRevisionModal()">&times;</button>
     </div>
     
     <form id="revisionForm">
@@ -539,7 +544,8 @@
       const dateRequested = new Date(quote.dateRequested).toLocaleDateString();
       
       return `
-        <div style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); 
+        <div style="background: rgba(255, 255, 255, 0.1); -webkit-backdrop-filter: blur(10px);
+ backdrop-filter: blur(10px); 
                     padding: 1.5rem; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.2); 
                     margin-bottom: 1rem;">
           <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
@@ -589,7 +595,7 @@
 
           ${quote.status === 'completed' && !quote.revisionRequest ? `
             <div style="margin-top: 1rem;">
-              <button class="btn btn-revision" onclick="openRevisionModal('${quote._id}')">
+              <button type="button" class="btn btn-revision" onclick="openRevisionModal('${quote._id}')">
                 🔄 Request Revision
               </button>
             </div>

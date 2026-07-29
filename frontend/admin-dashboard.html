@@ -26,6 +26,7 @@
     
     nav {
       background: rgba(52, 113, 204, 0.3);
+      -webkit-backdrop-filter: blur(10px);
       backdrop-filter: blur(10px);
       padding: 1rem 2rem;
       display: flex;
@@ -139,6 +140,7 @@
     
     .stat-card {
       background: rgba(255, 255, 255, 0.1);
+      -webkit-backdrop-filter: blur(10px);
       backdrop-filter: blur(10px);
       padding: 1.5rem;
       border-radius: 12px;
@@ -199,6 +201,7 @@
     
     .quote-card {
       background: rgba(255, 255, 255, 0.1);
+      -webkit-backdrop-filter: blur(10px);
       backdrop-filter: blur(10px);
       padding: 1.5rem;
       border-radius: 12px;
@@ -342,6 +345,7 @@
     
     footer {
       background: rgba(52, 113, 204, 0.3);
+      -webkit-backdrop-filter: blur(10px);
       backdrop-filter: blur(10px);
       padding: 1rem;
       text-align: center;
@@ -357,7 +361,7 @@
   </div>
   <div class="nav-right">
     <span>Admin: <strong id="adminName">Loading...</strong></span>
-    <button class="btn-logout" onclick="logout()">Logout</button>
+    <button type="button" class="btn-logout" onclick="logout()">Logout</button>
   </div>
 </nav>
 
@@ -403,7 +407,8 @@
 
    <!-- Change Password Section -->
   <div style="max-width: 600px; margin: 2rem auto 3rem auto;">
-    <div style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); padding: 2rem; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.2);">
+    <div style="background: rgba(255, 255, 255, 0.1); -webkit-backdrop-filter: blur(10px);
+ backdrop-filter: blur(10px); padding: 2rem; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.2);">
       <h3 style="color: #50c2f7; margin-bottom: 1.5rem;">🔒 Change Password</h3>
       <form id="changePasswordForm">
         <div class="form-group">
@@ -431,15 +436,15 @@
   </h2>
 
 <div class="tabs">
-  <button class="tab-btn active" onclick="filterQuotes('all')">All Quotes</button>
-  <button class="tab-btn" onclick="filterQuotes('pending')">⏳ Pending</button>
-  <button class="tab-btn" onclick="filterQuotes('reviewing')">👀 Reviewing</button>
-  <button class="tab-btn" onclick="filterQuotes('quoted')">💰 Quoted</button>
-  <button class="tab-btn" onclick="filterQuotes('accepted')">✅ Accepted</button>
-  <button class="tab-btn" onclick="filterQuotes('in_progress')">🚀 In Progress</button>
-  <button class="tab-btn" onclick="filterQuotes('revision_requested')">🔄 Revisions</button>
-  <button class="tab-btn" onclick="filterQuotes('completed')">🎉 Completed</button>
-  <button class="tab-btn" onclick="filterQuotes('rejected')">❌ Rejected</button>
+  <button type="button" class="tab-btn active" onclick="filterQuotes('all')">All Quotes</button>
+  <button type="button" class="tab-btn" onclick="filterQuotes('pending')">⏳ Pending</button>
+  <button type="button" class="tab-btn" onclick="filterQuotes('reviewing')">👀 Reviewing</button>
+  <button type="button" class="tab-btn" onclick="filterQuotes('quoted')">💰 Quoted</button>
+  <button type="button" class="tab-btn" onclick="filterQuotes('accepted')">✅ Accepted</button>
+  <button type="button" class="tab-btn" onclick="filterQuotes('in_progress')">🚀 In Progress</button>
+  <button type="button" class="tab-btn" onclick="filterQuotes('revision_requested')">🔄 Revisions</button>
+  <button type="button" class="tab-btn" onclick="filterQuotes('completed')">🎉 Completed</button>
+  <button type="button" class="tab-btn" onclick="filterQuotes('rejected')">❌ Rejected</button>
 </div>
 
   <div id="loadingQuotes" class="loading">Loading quotations...</div>
@@ -452,7 +457,7 @@
   <div class="modal-content">
     <div class="modal-header">
       <h3>Respond to Quote</h3>
-      <button class="close-modal" onclick="closeModal()">&times;</button>
+      <button type="button" class="close-modal" onclick="closeModal()">&times;</button>
     </div>
     
     <form id="responseForm">
@@ -497,7 +502,7 @@
   <div class="modal-content">
     <div class="modal-header">
       <h3>Review Revision Request</h3>
-      <button class="close-modal" onclick="closeRevisionModal()">&times;</button>
+      <button type="button" class="close-modal" onclick="closeRevisionModal()">&times;</button>
     </div>
     
     <form id="revisionForm">
@@ -724,28 +729,28 @@
 
         <div class="quote-actions">
           ${quote.status === 'accepted' ? `
-            <button class="btn" style="background: #00BCD4; color: white;" onclick="updateQuoteStatus('${quote._id}', 'in_progress')">
+            <button type="button" class="btn" style="background: #00BCD4; color: white;" onclick="updateQuoteStatus('${quote._id}', 'in_progress')">
               🚀 Start Work
             </button>
           ` : quote.status === 'in_progress' ? `
-            <button class="btn btn-success" onclick="updateQuoteStatus('${quote._id}', 'completed')">
+            <button type="button" class="btn btn-success" onclick="updateQuoteStatus('${quote._id}', 'completed')">
               ✅ Mark as Completed
             </button>
-            <button class="btn btn-primary" onclick="openResponseModal('${quote._id}')">
+            <button type="button" class="btn btn-primary" onclick="openResponseModal('${quote._id}')">
               ✏️ Update Notes
             </button>
           ` : quote.status === 'completed' ? `
           <span style="color: #8BC34A; font-weight: 600;">✅ Project Completed</span>
           ${quote.revisionRequest ? `<p style="color: #ddd; font-size: 0.9rem; margin-top: 0.5rem;">Revision requests are handled by clients.</p>` : ''}
         ` : quote.status === 'revision_requested' ? `
-          <button class="btn" style="background: #4CAF50; color: white;" onclick="openRevisionModal('${quote._id}')">
+          <button type="button" class="btn" style="background: #4CAF50; color: white;" onclick="openRevisionModal('${quote._id}')">
             ✅ Review & Accept Revision
           </button>
-          <button class="btn btn-danger" onclick="rejectRevision('${quote._id}')">
+          <button type="button" class="btn btn-danger" onclick="rejectRevision('${quote._id}')">
             ❌ Reject Revision
           </button>
           ` : `
-            <button class="btn btn-primary" onclick="openResponseModal('${quote._id}')">
+            <button type="button" class="btn btn-primary" onclick="openResponseModal('${quote._id}')">
               Respond
             </button>
           `}
